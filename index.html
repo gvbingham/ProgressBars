@@ -94,6 +94,7 @@
     }
     .action_container {
         text-align : right;
+        z-index: 15;
     }
 </style>
     </head>
@@ -109,7 +110,7 @@
             <div class="bar_container">
                 <div id="title_{{id}}" class="title_container">{{title}}</div>
                 <div id="time_{{id}}" class="remaining_time_container">{{time}}</div>
-                <div id="action_{{id}}" class="action_container">OK | X</div>
+                <div id="action_{{id}}" class="action_container"><span onclick="reset_bar('{{id}}')">OK</span> | <span onclick="delete_bar('{{id}}')">X</span></div>
                 <svg id="svg_{{id}}"><g><rect class="bg-bar" width="100%" height="100%" style="fill:rgb(0,0,255); stroke-width:1; stroke:rgb(0,0,0)"/></g></svg>
             </div>
         </script>
@@ -180,7 +181,7 @@ function get_relative_time_difference (seconds) {
     return relative_time;
 }
 
-function get_relative_time_text (seconds) {
+function get_relative_time_text (seconds) { //Will convert a number like this 1110203 to something like this "1 Week, 4 Days, 8 Hours, ... " etc.
     var time_obj = get_relative_time_difference(seconds);
     var temp_string = '';
     for (var scope in time_obj) {
@@ -247,7 +248,7 @@ var BAR = BAR || {
 function create_bar(args) {
     if (args === undefined) {args = {}}
     var time = get_time();
-    this.id          = get_id(); 
+    this.id          = create_id(); 
     this.title       = args.title || 'New bar - ' + Math.round(Date.now() / 1000); 
     this.description = args.description || 'None';
     this.category    = args.category || 'main';
@@ -278,7 +279,7 @@ function get_categories_list() {
     return temp_array;
 }
 
-function get_id() {
+function create_id() { //create id like 
     var tmp_string = '';
     for(var i = 0; i <= 5; i++){
         tmp_string += BAR.data.char_set.charAt(Math.floor(Math.random() * 63));
@@ -286,13 +287,25 @@ function get_id() {
     return tmp_string;
 }
 
-function delete_bar (position) {
-    BAR.bars.splice(position, 1);
+function get_index_by_id (id) { //get the index of the bar providing the id of the bar
+    for (var x in BAR.bars) {
+        if (BAR.bars[x].id == id){
+            return x;
+        }     
+    }
+    return 'not found';
+}
+
+function delete_bar (id) {
+    var index = get_index_by_id(id);
+    //put if statement on if not found
+    BAR.bars.splice(index, 1);
     display();
     save_local();
 }
 
-function update_bar (index, args) {
+function update_bar (id, args) {
+    var index = get_index_by_id();
     var my_bar = BAR.bars[index];
     for (var key in args) {
         //Need logic for handing of history (which is an array)
@@ -302,6 +315,13 @@ function update_bar (index, args) {
     }
     BAR.bars[index] = my_bar;
     display();
+}
+
+function reset_bar (id) {
+    var index = get_index_by_id(id);
+    // Need to get if check on 'not found'
+    update_bar(index, {stamp : Date.now()});
+    save_local();
 }
 
 function get_percent (stamp, scope_value, reverse) {
@@ -383,19 +403,23 @@ function add() {
         temp_bar.scope = document.getElementById('scope_dropdown').value;
     }
     else if (document.getElementById('input_date').disabled != true || document.getElementById('input_time').disabled != true) {
-        //temp_bar.value = get_target_seconds(); 
-        //temp_bar.scope = 'Seconds';
         temp_bar.date = document.querySelector('#input_date').value;
         temp_bar.time = document.querySelector('#input_time').value;
     }
     BAR.bars.push(new create_bar(temp_bar));
     save_local();
     display();
+    reset_form();
+}
+
+function reset_form() {
     document.getElementById('add_modify_popup').style.display = 'none';
-    document.getElementById('input_title').value              = '';
-    document.getElementById('input_description').value        = '';
-    document.getElementById('input_category').value           = '';
-    document.getElementById('input_value').value              = '';
+    document.getElementById('input_title').value              = null;
+    document.getElementById('input_description').value        = null;
+    document.getElementById('input_category').value           = null;
+    document.getElementById('input_value').value              = null;
+    document.getElementById('input_date').value               = null;
+    document.getElementById('input_time').value               = null;
     document.getElementById('scope_dropdown').selected        = 'Seconds';
 }
 
