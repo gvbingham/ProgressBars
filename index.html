@@ -28,12 +28,19 @@
         padding : 0px 0px 0px 0px;
     } 
     #add_modify_popup {
-        position : absolute;
-        top : 10%;
         z-index : 100;
         background-color : gray;
         padding : 10px;
+        margin : auto;
         display : none;
+    }
+    #add_modify_container {
+        display : none; 
+        width : 100%;
+        height : 100%;
+        position : absolute;
+        top : 0px;
+        background: rgba(0, 0, 0, 0.6);
     }
     .bar_container {
         height : 30px;
@@ -114,39 +121,41 @@
                 <svg id="svg_{{id}}"><g><rect class="bg-bar" width="100%" height="100%" style="fill:rgb(0,0,255); stroke-width:1; stroke:rgb(0,0,0)"/></g></svg>
             </div>
         </script>
-        <div id="add_modify_popup">
-            <div>
-                <fieldset>
-                    <legend>Info</legend>
-                    <input type="text" id="input_title" placeholder="Title"></input><br>
-                    <input type="text" id="input_description" placeholder="Description"></input></label><br>
-                    <input type="text" id="input_category" placeholder="Category"></input></label><br>
-                </fieldset>
+        <div id="add_modify_container">
+            <div id="add_modify_popup">
+                <div>
+                    <fieldset>
+                        <legend>Info</legend>
+                        <input type="text" id="input_title" placeholder="Title"></input><br>
+                        <input type="text" id="input_description" placeholder="Description"></input></label><br>
+                        <input type="text" id="input_category" placeholder="Category"></input></label><br>
+                    </fieldset>
+                </div>
+                <div onclick="toggle_to_interval()">
+                    <fieldset>
+                        <legend>Interval</legend>
+                        <input type="text" style="width : 38px" id="input_value" placeholder="Value"></input></label>
+                        <select id="scope_dropdown">
+                            <option value="Seconds">Seconds</option>
+                            <option value="Minutes">Minutes</option>
+                            <option value="Hours">Hours</option>
+                            <option value="Days">Days</option>
+                            <option value="Weeks">Weeks</option>
+                            <option value="Months">Months</option>
+                            <option value="Years">Years</option>
+                        </select><br>
+                    </fieldset>
+                </div>
+                <div onclick="toggle_to_target()">
+                    <fieldset>
+                        <legend>Target</legend>
+                        <input type="date" id="input_date" disabled><br>
+                        <input type="time" id="input_time" disabled><br>
+                    </fieldset>
+                </div>
+                <br>
+                <button onclick="add()" id="add_modify_add_button">Add</button>
             </div>
-            <div onclick="toggle_to_interval()">
-                <fieldset>
-                    <legend>Interval</legend>
-                    <input type="text" style="width : 38px" id="input_value" placeholder="Value"></input></label>
-                    <select id="scope_dropdown">
-                        <option value="Seconds">Seconds</option>
-                        <option value="Minutes">Minutes</option>
-                        <option value="Hours">Hours</option>
-                        <option value="Days">Days</option>
-                        <option value="Weeks">Weeks</option>
-                        <option value="Months">Months</option>
-                        <option value="Years">Years</option>
-                    </select><br>
-                </fieldset>
-            </div>
-            <div onclick="toggle_to_target()">
-                <fieldset>
-                    <legend>Target</legend>
-                    <input type="date" id="input_date" disabled><br>
-                    <input type="time" id="input_time" disabled><br>
-                </fieldset>
-            </div>
-            <br>
-            <button onclick="add()" id="add_modify_add_button">Add</button>
         </div>
     </body>
     
@@ -343,7 +352,7 @@ function get_percent (stamp, scope_value, reverse) {
 // Category Functions //
 ////////////////////////
 
-function get_unique () {
+function get_unique_category_list () {
     var array = get_categories_list();
     temp_array = [];
     for (var i in array) {
@@ -360,6 +369,7 @@ function get_unique () {
 function toggle_add_popup_display() {
     var state = document.querySelector('#add_modify_popup').style.display;
     document.querySelector('#add_modify_popup').style.display = (state == 'none' || state == '') ? 'block' : 'none';
+    document.querySelector('#add_modify_container').style.display = (state == 'none' || state == '') ? 'flex' : 'none';
 }
 
 function populate_category_header() {
