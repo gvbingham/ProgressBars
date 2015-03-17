@@ -314,7 +314,7 @@ function delete_bar (id) {
 }
 
 function update_bar (id, args) {
-    var index = get_index_by_id();
+    var index = get_index_by_id(id);
     var my_bar = BAR.bars[index];
     for (var key in args) {
         //Need logic for handing of history (which is an array)
@@ -327,25 +327,50 @@ function update_bar (id, args) {
 }
 
 function reset_bar (id) {
-    var index = get_index_by_id(id);
     // Need to get if check on 'not found'
-    update_bar(index, {stamp : Date.now()});
+    update_bar(id, {stamp : Date.now()});
     save_local();
 }
 
-function get_percent (stamp, scope_value, reverse) {
+function get_percent (i) {
     var now = get_time();
-    var diff = (now - stamp) / 1000;
-    var percent = (reverse) ? 100 - (diff / scope_value) * 100  : (diff / scope_value) * 100;
-    if (percent > 100) {
-        return 100;     
-    }
-    else if (percent < 0) {
-        return 0; 
-    }
+    var diff = (now - BAR.bars[i].stamp) / 1000;
+    //if (BAR.bars[i].type != 'count_up') {
+        var percent = (BAR.bars[i].type != 'reverse') ? 100 - (diff / BAR.bars[i].scope_value) * 100  : (diff / BAR.bars[i].scope_value) * 100;
+        if (percent > 100) {
+            return 100;     
+        }
+        else if (percent < 0) {
+            return 0; 
+        }
+        else {
+            return percent;
+        }
+    //}
+    /* 
     else {
-        return percent;
+        var percent;
+        var relative_time = {
+            Seconds : 1, 
+            Minutes : 60, 
+            Hours   : 3600, 
+            Days    : 86400, 
+            Weeks   : 604800, 
+            Months  : 2628000, 
+            Years   : 31536000, 
+        };
+
+        for (var scope in relative_time) {
+            var scope_seconds = relative_time[scope];
+            if (seconds >= scope_seconds) {
+                relative_time[scope] = Math.floor(seconds / scope_seconds)    
+                seconds = seconds % scope_seconds;
+            } 
+            else {relative_time[scope] = 0}
+        }
+        return relative_time;
     }
+    */
 }
 
 ////////////////////////
@@ -475,11 +500,13 @@ function sync() {
 ////////////////////////////
 (function draw_frame() {
     for (var i in BAR.bars) {
-        if (document.getElementById('svg_' + BAR.bars[i].id)) {
-            document.getElementById('svg_' + BAR.bars[i].id).style.width = get_percent(BAR.bars[i].stamp, BAR.bars[i].scope_value, 1) + '%';
-        }
-        if (document.getElementById('time_' + BAR.bars[i].id)) {
-            document.getElementById('time_' + BAR.bars[i].id).innerHTML = get_relative_time_text(get_remaining_seconds(i));
+        if (BAR.settings.current_category == BAR.bars[i].category) { // if in same category
+            if (document.getElementById('svg_' + BAR.bars[i].id)) {
+                document.getElementById('svg_' + BAR.bars[i].id).style.width = get_percent(i) + '%';
+            }
+            if (document.getElementById('time_' + BAR.bars[i].id)) {
+                document.getElementById('time_' + BAR.bars[i].id).innerHTML = get_relative_time_text(get_remaining_seconds(i));
+            }
         }
     }
     //Draw the recalculation of time
