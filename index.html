@@ -554,6 +554,7 @@ function sort_execute (arr, type) {
 }
 
 function sort_array (arr, type) {
+    //TODO also program in reverse sorting for each
     for (index in BAR.bars) {
         get_percent(index, 'sort'); 
     }
@@ -570,12 +571,12 @@ function sort_array (arr, type) {
     }
     if (type == 'percent') {
         return arr.sort(function (a,b) {
-            //return a.    What do
             if (arr.indexOf(a) !== -1 || arr.indexOf(b) !== -1) {
                 return a.percent - b.percent;
             }
         })
     }
+    //TODO Add date added
 }
 ////////////////////////////
 // localStorage functions //
