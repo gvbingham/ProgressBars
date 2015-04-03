@@ -89,6 +89,8 @@
     } 
     #right_header {
         flex-grow : 1;
+        text-align: right;
+        padding-right: 5px;
     } 
     #add_modify_add_button {
         width : 100%;
@@ -126,7 +128,7 @@
                    <!-- populated with categories see display(); -->
                 </select>
             </div> 
-            <div id="right_header"></div>
+            <div id="right_header"><span onclick="sort_execute(BAR.bars, 'alpha')">Alpha</span> | <span onclick="sort_execute(BAR.bars, 'percent')">Percent</span></div>
         </div>
         <div id="bars_container"></div> 
             <script id="bar_html" type="text/x-handlebars-template">
@@ -379,7 +381,7 @@ function reset_bar (id) {
     save_local();
 }
 
-function get_percent (index) {
+function get_percent (index, sort) {
     var diff = (Date.now() - BAR.bars[index].stamp) / 1000;
     if (BAR.bars[index].type == 'count_down') {
         var percent = function () {
@@ -407,14 +409,18 @@ function get_percent (index) {
         return 0;
     }
     // percent scrubber
-    if (percent() > 100) {
+    var cent = percent();
+    if (sort) {
+        BAR.bars[index].percent = cent;
+    }
+    if (cent > 100) {
         return 100;     
     }
-    else if (percent() < 0) {
+    else if (cent < 0) {
         return 0; 
     }
     else {
-        return percent();
+        return cent;
     }
 }
 
@@ -541,6 +547,36 @@ function get_target_seconds(date, time) {
     return secs_to_date + secs_to_time;
 }
 
+function sort_execute (arr, type) {
+    BAR.bars = sort_array(arr, type);
+    save_local();
+    display();
+}
+
+function sort_array (arr, type) {
+    for (index in BAR.bars) {
+        get_percent(index, 'sort'); 
+    }
+    if (type == 'alpha') {
+        return arr.sort(function (a,b) {
+            if (a.title > b.title) {
+                return 1;
+            }
+            if (a.title < b.title) {
+                return -1;
+            }
+            return 0;
+        });
+    }
+    if (type == 'percent') {
+        return arr.sort(function (a,b) {
+            //return a.    What do
+            if (arr.indexOf(a) !== -1 || arr.indexOf(b) !== -1) {
+                return a.percent - b.percent;
+            }
+        })
+    }
+}
 ////////////////////////////
 // localStorage functions //
 ////////////////////////////
@@ -556,7 +592,7 @@ function save_local() {
 function sync() {
     get_local();
     display();
-    populate_category_header();
+    //populate_category_header();
 }
 
 ////////////////////////////
