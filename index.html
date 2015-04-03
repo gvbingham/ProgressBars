@@ -381,7 +381,7 @@ function reset_bar (id) {
 
 function get_percent (index) {
     var diff = (Date.now() - BAR.bars[index].stamp) / 1000;
-    if (BAR.bars[index].type == 'count_down_type') {
+    if (BAR.bars[index].type == 'count_down') {
         var percent = function () {
             return 100 - (diff / BAR.bars[index].scope_value) * 100;
         }
@@ -430,7 +430,7 @@ function get_unique_category_list () {
             temp_array.push(array[i]); 
         } 
     } 
-    return temp_array;
+    return temp_array.sort();
 }
 
 //////////////////
@@ -441,6 +441,7 @@ function toggle_add_popup_display() {
     document.querySelector('#add_modify_popup').style.display = (state == 'none' || state == '') ? 'block' : 'none';
     document.querySelector('#add_modify_container').style.display = (state == 'none' || state == '') ? 'flex' : 'none';
 }
+
 
 function toggle_add_options(whatami) {
     var iamnot = {
@@ -512,7 +513,7 @@ function display() { //Used to first draw all in the viewed category
     var template = Handlebars.compile(bar_html_source);
     var tmpstring = "";
     for (var i in BAR.bars) {
-        if (BAR.bars[i].category === BAR.settings.current_category) {
+        if (BAR.bars[i].category === BAR.settings.current_category || BAR.settings.current_category === "all") {
             tmpstring += template(BAR.bars[i]); 
             //tmpstring += (BAR.bars[i].category == category) ? bar_container + BAR.bars[i].svg + '</div>' : "";
         }
@@ -524,11 +525,12 @@ function display() { //Used to first draw all in the viewed category
     //////////////////////////////
     var tmpstring = ""; //ok
     var categories = get_unique_category_list(); //ok
+    tmpstring += '<option value="all"selected>all</option>';
     for (var i in categories) {
         if (categories[i] == BAR.settings.current_category) {
-            tmpstring += '<option value="' + categories[i] + '" selected>' + categories[i] + '</option>';
+            tmpstring += '<option value="' + categories[i] + '"selected>' + categories[i] + '</option>';
         }
-        else {tmpstring += '<option value="' + categories[i] + '">' + categories[i] + '</option>';}
+        else {tmpstring += '<option value="' + categories[i] + '">' + categories[i] + '</option>';  }
     } 
     document.getElementById("select_category").innerHTML = tmpstring;
 }
@@ -554,6 +556,7 @@ function save_local() {
 function sync() {
     get_local();
     display();
+    populate_category_header();
 }
 
 ////////////////////////////
@@ -561,7 +564,7 @@ function sync() {
 ////////////////////////////
 (function draw_frame() {
     for (var i in BAR.bars) {
-        if (BAR.settings.current_category == BAR.bars[i].category) { // if in same category
+        if (BAR.settings.current_category == BAR.bars[i].category || BAR.settings.current_category == "all") { // if in same category
             if (document.getElementById('svg_' + BAR.bars[i].id)) {
                 document.getElementById('svg_' + BAR.bars[i].id).style.width = get_percent(i) + '%';
             }
