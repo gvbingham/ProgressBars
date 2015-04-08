@@ -133,6 +133,12 @@ function create_bar(args) {
         this.scope = 'Seconds';    
         this.value = get_target_seconds(this.date, this.time);
     }
+    if (this.type == 'count_up') {
+        this.color = 'red';
+    }
+    else {
+        this.color = 'blue';
+    }
     this.scope_value = get_scope(this.scope, this.value) || 60 * 5; 
 } 
 
