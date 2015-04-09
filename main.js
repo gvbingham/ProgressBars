@@ -134,7 +134,7 @@ function create_bar(args) {
         this.value = get_target_seconds(this.date, this.time);
     }
     if (this.type == 'count_up') {
-        this.color = 'red';
+        this.color = 'lightBlue';
     }
     else {
         this.color = 'blue';
