@@ -1,6 +1,7 @@
 {
-    "dependencies": {
-        "chai": "*",
-        "mocha": "*"
-    }
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*"
+    "karma": "*"
+  },
 }
