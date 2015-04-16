@@ -44,11 +44,11 @@ function get_remaining_seconds(bars_index_num) {
 function get_how_many_seconds_to_date (date) {
     //var date_value = document.querySelector('#input_date').value;
     var seconds;
-    if (date !== "") {
+    if (date) {
         return Math.floor((Date.parse(date) / 1000) - (Date.now() / 1000));
     }
     else {
-        throw 'you didn\'t specify a date';
+        throw 'you did not specify a date';
     }
 }
 
@@ -63,7 +63,7 @@ function get_how_many_seconds_to_time (time) {
         return hour + minute;
     }
     else {
-        throw 'you didn\'t specify a date';
+        throw new Error('you did not specify a date');
     }
 }
 

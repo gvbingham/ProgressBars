@@ -1,7 +1,12 @@
 {
   "devDependencies": {
     "chai": "*",
-    "mocha": "*"
-    "karma": "*"
-  },
+    "mocha": "*",
+    "karma": "*",
+    "karma-chrome-launcher": "*",
+    "karma-firefox-launcher": "*",
+    "karma-mocha": "*",
+    "karma-safari-launcher": "*",
+    "blanket": "*"
+  }
 }
