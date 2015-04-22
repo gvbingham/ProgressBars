@@ -47,9 +47,6 @@ function get_how_many_seconds_to_date (date) {
     if (date && Date.parse(date) != NaN) {
         return Math.floor((Date.parse(date) / 1000) - (Date.now() / 1000));
     }
-    else {
-        return 0; 
-    }
 }
 
 function get_how_many_seconds_to_time (time) {
@@ -61,9 +58,6 @@ function get_how_many_seconds_to_time (time) {
         hour = hour * 3600;
         minute = minute * 60;
         return hour + minute;
-    }
-    else {
-        throw new Error('you did not specify a date');
     }
 }
 
@@ -119,7 +113,7 @@ function create_bar(args) {
     var time = get_time();
     this.id          = create_id(); 
     this.title       = args.title || 'New bar - ' + Math.round(Date.now() / 1000); 
-    this.description = args.description || 'None';
+    this.description = args.description || null;
     this.category    = args.category || 'main';
     this.created     = args.created || time;
     this.stamp       = args.created || time;
@@ -157,7 +151,7 @@ function get_categories_list() {
 function create_id() { //create id like 
     var tmp_string = '';
     for(var i = 0; i <= 5; i++){
-        tmp_string += data.char_set.charAt(Math.floor(Math.random() * 63));
+        tmp_string += data.char_set.charAt(Math.floor(Math.random() * 62));
     } 
     return tmp_string;
 }
