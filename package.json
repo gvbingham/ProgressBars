@@ -10,14 +10,14 @@
     "express": "*"
   },
   "devDependencies": {
-    "mocha": "~2.2.4"
+    "mocha": "~2.2.4",
     "karma-safari-launcher": "*",
     "karma": "*",
     "karma-mocha": "*",
     "karma-chrome-launcher": "*",
     "blanket": "*",
     "karma-firefox-launcher": "*",
-    "chai": "*",
+    "chai": "*"
   },
   "scripts": {
     "test": "mocha"
