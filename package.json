@@ -1,7 +1,42 @@
 {
-  "devDependencies": {
-    "chai": "*",
-    "mocha": "*"
-    "karma": "*"
+  "name": "ProgressBars",
+  "version": "0.0.0",
+  "description": "Tool used to systematically better oneself.",
+  "main": "server.js",
+  "directories": {
+    "test": "test"
   },
+  "dependencies": {
+    "express": "*"
+  },
+  "devDependencies": {
+    "mocha": "~2.2.4"
+    "karma-safari-launcher": "*",
+    "karma": "*",
+    "karma-mocha": "*",
+    "karma-chrome-launcher": "*",
+    "blanket": "*",
+    "karma-firefox-launcher": "*",
+    "chai": "*",
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gvbingham/ProgressBars.git"
+  },
+  "keywords": [
+    "todo",
+    "list",
+    "progress",
+    "track",
+    "self-help",
+    "betterment"
+  ],
+  "author": "Gavin Bingham",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gvbingham/ProgressBars/issues"
+  }
 }
