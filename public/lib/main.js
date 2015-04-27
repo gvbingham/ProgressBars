@@ -120,10 +120,8 @@ function update_bar (id, args) {
             my_bar[key] = args[key];
         }
     }
+    save_local();
     return my_bar;
-    //BAR.bars[index] = my_bar;
-    //data.need_refresh = true;
-    //save_local();
 }
 
 function reset_bar (id) {
@@ -235,23 +233,3 @@ function get_remaining_seconds(index) {
     }
     return Math.floor((BAR.bars[index].stamp / 1000 + BAR.bars[index].scope_value) - (Date.now() / 1000)) 
 }
-(function draw_frame() {
-    if (data.need_refresh) {
-        display(); 
-        data.need_refresh = undefined;
-    }
-    for (var i in BAR.bars) {
-        if (BAR.settings.current_category == BAR.bars[i].category || BAR.settings.current_category == "all") { // if in same category
-            if (document.getElementById('svg_' + BAR.bars[i].id)) {
-                document.getElementById('svg_' + BAR.bars[i].id).style.width = get_percent(i) + '%';
-            }
-            if (document.getElementById('time_' + BAR.bars[i].id)) {
-                document.getElementById('time_' + BAR.bars[i].id).innerHTML = get_relative_time_text(get_remaining_seconds(i));
-            }
-        }
-    }
-    //Draw the recalculation of time
-    window.requestAnimationFrame(draw_frame);
-})();
-    
-window.onload = sync;
