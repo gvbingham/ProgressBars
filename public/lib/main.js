@@ -1,66 +1,3 @@
-function get_time() {
-    return Date.now();
-} 
-
-function get_relative_time_difference (seconds) {
-    var relative_time = {
-        Years   : 31536000, 
-        Months  : 2628000, 
-        Weeks   : 604800, 
-        Days    : 86400, 
-        Hours   : 3600, 
-        Minutes : 60, 
-        Seconds : 1, 
-    };
-    for (var scope in relative_time) {
-        var scope_seconds = relative_time[scope];
-        if (seconds >= scope_seconds) {
-            relative_time[scope] = Math.floor(seconds / scope_seconds)    
-            seconds = seconds % scope_seconds;
-        } 
-        else {relative_time[scope] = 0}
-    }
-    return relative_time;
-}
-
-function get_relative_time_text (seconds) { //Will convert a number like this 1110203 to something like this "1 Week, 4 Days, 8 Hours, ... " etc.
-    var time_obj = get_relative_time_difference(seconds);
-    var temp_string = '';
-    for (var scope in time_obj) {
-        if (time_obj[scope] != 0) {
-            temp_string += time_obj[scope] + ' ' + scope + ' ';
-        } 
-    }
-    return temp_string;
-}
-
-function get_remaining_seconds(bars_index_num) {
-    if (BAR.bars[bars_index_num].type == "count_up") {
-        return (Date.now() - BAR.bars[bars_index_num].stamp) / 1000;
-    }
-    return Math.floor((BAR.bars[bars_index_num].stamp / 1000 + BAR.bars[bars_index_num].scope_value) - (Date.now() / 1000)) 
-}
-
-function get_how_many_seconds_to_date (date) {
-    //var date_value = document.querySelector('#input_date').value;
-    var seconds;
-    if (date && Date.parse(date) != NaN) {
-        return Math.floor((Date.parse(date) / 1000) - (Date.now() / 1000));
-    }
-}
-
-function get_how_many_seconds_to_time (time) {
-    //var time_string = document.querySelector('#input_time').value;
-    if (time !== "") {
-        var time_array = time.split(':');
-        var hour = Number(time_array[0]);
-        var minute = Number(time_array[1]);
-        hour = hour * 3600;
-        minute = minute * 60;
-        return hour + minute;
-    }
-}
-
 
 ///////////////////
 // BAR Functions //
@@ -92,12 +29,13 @@ var data = {
         {scope : 'Months',  value : 2628000,  cap : 8},
         {scope : 'Years',   value : 31536000, cap : 55},
     ],
+    need_refresh : true,
 };
 
 data.fib_values = (function () {
     var relative_time = data.relative_time;
     var fib = data.fib;
-    var temp = [];
+    var temp = [0];
     for (var temp_index in relative_time) {
         for (var temp_fib_index in fib) {
             if (fib[temp_fib_index] <= relative_time[temp_index].cap) { // only to the cap
@@ -159,18 +97,18 @@ function create_id() { //create id like
 function get_index_by_id (id) { //get the index of the bar providing the id of the bar
     for (var x in BAR.bars) {
         if (BAR.bars[x].id == id){
-            return x;
+            return Number(x);
         }     
     }
-    return 'not found';
 }
 
 function delete_bar (id) {
     var index = get_index_by_id(id);
     //put if statement on if not found
     BAR.bars.splice(index, 1);
-    display();
+    data.need_refresh = true;
     save_local();
+    return BAR.bars;
 }
 
 function update_bar (id, args) {
@@ -178,18 +116,19 @@ function update_bar (id, args) {
     var my_bar = BAR.bars[index];
     for (var key in args) {
         //Need logic for handing of history (which is an array)
-        if (my_bar[key] !== undefined) {
+        if (my_bar.hasOwnProperty(key)) {
             my_bar[key] = args[key];
         }
     }
-    BAR.bars[index] = my_bar;
-    display();
+    return my_bar;
+    //BAR.bars[index] = my_bar;
+    //data.need_refresh = true;
+    //save_local();
 }
 
 function reset_bar (id) {
     // Need to get if check on 'not found'
-    update_bar(id, {stamp : Date.now()});
-    save_local();
+    return update_bar(id, {stamp : Date.now()});
 }
 
 function get_percent (index, sort) {
@@ -208,7 +147,7 @@ function get_percent (index, sort) {
         var percent = function () {
             var fib_values = data.fib_values;
             for (var fib_seconds_index in fib_values) {
-                var fib_seconds_index = parseInt(fib_seconds_index);
+                var fib_seconds_index = Number(fib_seconds_index);
                 if (diff >= fib_values[fib_seconds_index] && diff <= fib_values[fib_seconds_index + 1]) {
                     return (diff - fib_values[fib_seconds_index]) / (fib_values[fib_seconds_index + 1] - fib_values[fib_seconds_index]) * 100;
                 }
@@ -216,7 +155,6 @@ function get_percent (index, sort) {
         }
     }
     else { //fail gracefully
-        console.warn('bar ' + index + ' may need to be fixed or updated. It\'s type doesn\'t equal a defined type')
         return 0;
     }
     // percent scrubber
@@ -235,10 +173,6 @@ function get_percent (index, sort) {
     }
 }
 
-////////////////////////
-// Category Functions //
-////////////////////////
-
 function get_unique_category_list () {
     var array = get_categories_list();
     temp_array = [];
@@ -250,118 +184,23 @@ function get_unique_category_list () {
     return temp_array.sort();
 }
 
-//////////////////
-// UI Functions //
-//////////////////
-function toggle_add_popup_display() {
-    var state = document.querySelector('#add_modify_container').style.display;
-    document.querySelector('#add_modify_popup').style.display = (state == 'none' || state == '') ? 'block' : 'none';
-    document.querySelector('#add_modify_container').style.display = (state == 'none' || state == '') ? 'flex' : 'none';
-}
-
-
-function toggle_add_options(whatami) {
-    var iamnot = {
-        fieldset_count_up : document.querySelector("#fieldset_count_up"),
-        fieldset_interval : document.querySelector("#fieldset_interval"),
-        fieldset_target : document.querySelector("#fieldset_target"),
-    };
-    var count_up_button = document.querySelector("#count_up_button");
-    var iam = iamnot['fieldset_' + whatami];
-    delete iamnot['fieldset_' + whatami];
-    iam.removeAttribute("disabled");
-    for (var key in iamnot) {
-        iamnot[key].setAttribute("disabled", "disabled")
-    }
-    if (whatami == "count_up"){
-        count_up_button.className = "count_up_enabled";
-    }
-    else {
-        count_up_button.className = "count_up_disabled";
-    }
-}
-
-function change_category(new_category) {
-   BAR.settings.current_category = new_category;
-   save_local();
-   display();
-}
-
-function add() { //revisit fix
-    var temp_bar = { //ok
-        title       : document.getElementById('input_title').value,
-        description : document.getElementById('input_description').value,
-        category    : document.getElementById('input_category').value,
-    };
-    if (document.getElementById('fieldset_interval').disabled != true) {
-        temp_bar.value = document.getElementById('interval_input_value').value;
-        temp_bar.scope = document.getElementById('scope_dropdown').value;
-    }
-    else if (document.getElementById('fieldset_target').disabled != true) {
-        temp_bar.date = document.querySelector('#input_date').value;
-        temp_bar.time = document.querySelector('#input_time').value;
-    }
-    else if (document.getElementById('fieldset_count_up').disabled != true) { //get this fixed.
-        temp_bar.type = "count_up";
-    }
-    BAR.bars.push(new create_bar(temp_bar));
-    save_local();
-    display();
-    reset_form();
-}
-
-function reset_form() {
-    document.getElementById('add_modify_popup').style.display = 'none';
-    document.getElementById('add_modify_container').style.display = 'none';
-    document.getElementById('input_title').value              = null;
-    document.getElementById('input_description').value        = null;
-    document.getElementById('input_category').value           = null;
-    document.getElementById('interval_input_value').value     = null;
-    document.getElementById('input_date').value               = null;
-    document.getElementById('input_time').value               = null;
-    document.getElementById('scope_dropdown').selected        = 'Seconds';
-}
-
-function display() { //Used to first draw all in the viewed category
-    ////////////////////////
-    // Templating of Bars //
-    ////////////////////////
-    var bar_html_source = document.getElementById('bar_html').innerHTML;
-    var template = Handlebars.compile(bar_html_source);
-    var tmpstring = "";
-    for (var i in BAR.bars) {
-        if (BAR.bars[i].category === BAR.settings.current_category || BAR.settings.current_category === "all") {
-            tmpstring += template(BAR.bars[i]); 
-            //tmpstring += (BAR.bars[i].category == category) ? bar_container + BAR.bars[i].svg + '</div>' : "";
-        }
-    } 
-    document.getElementById("bars_container").innerHTML = tmpstring;
-
-    //////////////////////////////
-    // Templating of Categories //
-    //////////////////////////////
-    var tmpstring = ""; //ok
-    var categories = get_unique_category_list(); //ok
-    tmpstring += '<option value="all"selected>all</option>';
-    for (var i in categories) {
-        if (categories[i] == BAR.settings.current_category) {
-            tmpstring += '<option value="' + categories[i] + '"selected>' + categories[i] + '</option>';
-        }
-        else {tmpstring += '<option value="' + categories[i] + '">' + categories[i] + '</option>';  }
-    } 
-    document.getElementById("select_category").innerHTML = tmpstring;
-}
-
 function get_target_seconds(date, time) {
     var secs_to_date = get_how_many_seconds_to_date(date);
     var secs_to_time = get_how_many_seconds_to_time(time);
     return secs_to_date + secs_to_time;
 }
 
+
 function sort_execute (arr, type) {
     BAR.bars = sort_array(arr, type);
     save_local();
-    display();
+    data.need_refresh = true;
+}
+
+function change_category(new_category) {
+   BAR.settings.current_category = new_category;
+   save_local();
+   data.need_refresh = true;
 }
 
 function sort_array (arr, type) {
@@ -389,20 +228,30 @@ function sort_array (arr, type) {
     }
     //TODO Add date added
 }
-////////////////////////////
-// localStorage functions //
-////////////////////////////
 
-function get_local() {
-    BAR.bars = JSON.parse(localStorage.Bars);
+function get_remaining_seconds(index) {
+    if (BAR.bars[index].type == "count_up") {
+        return (Date.now() - BAR.bars[index].stamp) / 1000;
+    }
+    return Math.floor((BAR.bars[index].stamp / 1000 + BAR.bars[index].scope_value) - (Date.now() / 1000)) 
 }
-
-function save_local() {
-    localStorage.Bars = JSON.stringify(BAR.bars);
-}
-
-function sync() {
-    get_local();
-    display();
-    //populate_category_header();
-}
+(function draw_frame() {
+    if (data.need_refresh) {
+        display(); 
+        data.need_refresh = undefined;
+    }
+    for (var i in BAR.bars) {
+        if (BAR.settings.current_category == BAR.bars[i].category || BAR.settings.current_category == "all") { // if in same category
+            if (document.getElementById('svg_' + BAR.bars[i].id)) {
+                document.getElementById('svg_' + BAR.bars[i].id).style.width = get_percent(i) + '%';
+            }
+            if (document.getElementById('time_' + BAR.bars[i].id)) {
+                document.getElementById('time_' + BAR.bars[i].id).innerHTML = get_relative_time_text(get_remaining_seconds(i));
+            }
+        }
+    }
+    //Draw the recalculation of time
+    window.requestAnimationFrame(draw_frame);
+})();
+    
+window.onload = sync;

@@ -3,6 +3,9 @@
     <head>
     <script type="text/javascript" src="lib/handlebars-v3.0.1.js"></script>
     <script src="lib/main.js"></script>
+    <script src="lib/time.js"></script>
+    <script src="lib/sync.js"></script>
+    <script src="lib/ui.js"></script>
     <link rel="stylesheet" type="text/css" href="styles/main.css">
     </head>
     <body>
@@ -68,23 +71,4 @@
             </div>
         </div>
     </body>
-
-<script>
-(function draw_frame() {
-    for (var i in BAR.bars) {
-        if (BAR.settings.current_category == BAR.bars[i].category || BAR.settings.current_category == "all") { // if in same category
-            if (document.getElementById('svg_' + BAR.bars[i].id)) {
-                document.getElementById('svg_' + BAR.bars[i].id).style.width = get_percent(i) + '%';
-            }
-            if (document.getElementById('time_' + BAR.bars[i].id)) {
-                document.getElementById('time_' + BAR.bars[i].id).innerHTML = get_relative_time_text(get_remaining_seconds(i));
-            }
-        }
-    }
-    //Draw the recalculation of time
-    window.requestAnimationFrame(draw_frame);
-})();
-    
-window.onload = sync;
-</script>
 </html>
