@@ -37,7 +37,7 @@ function handleAuthResult(authResult) {
     else {
         // No access token could be retrieved, show the button to start the authorization flow.
         //authButton.style.display = 'block';
-        var item = document.getElementById('header_container');
+        var item = document.getElementById('header_container'); // HEY HEY HEY need to update this to a button or some start page
         item.onclick = function() {
             gapi.auth.authorize(
                 {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': false},
@@ -45,4 +45,23 @@ function handleAuthResult(authResult) {
             );
         };
     }
+}
+
+
+function get_data_folder_info() {
+    var request = gapi.client.drive.files.get({
+        'fileId': 'appfolder'
+    });
+    request.execute(function(resp) {
+        console.log('Id: ' + resp.id);
+        console.log('Title: ' + resp.title);
+    });
+}
+
+function put_app_file() {
+
+}
+
+function read_app_file() {
+
 }
