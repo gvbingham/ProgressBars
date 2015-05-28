@@ -14,24 +14,32 @@
       </head>
     <body>
         <div id="header_container">
-            <div id="left_header"><button id="add_button" onclick="toggle_add_popup_display()">+</button></div>
+            <div id="left_header"><input type="image" alt="Add Bar" id="add_button" onclick="toggle_add_popup_display()"></input></div>
             <div id="center_header">
                 Category : 
                 <select id="select_category" onchange="change_category(this.value);">
                    <!-- populated with categories see display(); -->
                 </select>
             </div> 
-            <div id="right_header"><span onclick="sort_execute(BAR.bars, 'alpha')">Alpha</span> | <span onclick="sort_execute(BAR.bars, 'percent')">Percent</span></div>
+            <div id="right_header"><input type="image" alt="choose cloud" onclick="toggle_choosecloud_popup_display()"</input> <input type="image" onclick="sort_execute(BAR.bars, 'alpha')" alt="Alpha"></input> <input type="image" onclick="sort_execute(BAR.bars, 'percent')" alt="Percent"></input></div>
         </div>
         <div id="bars_container"></div> 
             <script id="bar_html" type="text/x-handlebars-template">
                 <div class="bar_container">
                     <div id="title_{{id}}" class="title_container">{{title}}</div>
                     <div id="time_{{id}}" class="remaining_time_container">{{time}}</div>
-                    <div id="action_{{id}}" class="action_container"><span onclick="reset_bar('{{id}}')">OK</span> | <span onclick="delete_bar('{{id}}')">X</span></div>
+                    <div id="action_{{id}}" class="action_container"><input type="image" alt="OK" onclick="reset_bar('{{id}}')"></input> | <input type="image" alt="Delete" onclick="delete_bar('{{id}}')"></span></div>
                     <svg id="svg_{{id}}"><g><rect class="bg-bar" width="100%" height="100%" style="fill:{{color}}; stroke-width:1; stroke:rgb(0,0,0)"/></g></svg>
                 </div>
             </script>
+        <div id="choosecloud_container">
+            <div id="choosecloud_popup">
+                <h2>Choose your preferred cloud</h2>
+                <input type="image" alt="Google Drive"></input>
+                <input type="image" style="display: none"></input>
+                <input type="image" style="display: none"></input>
+            </div>
+        </div>
         <div id="add_modify_container">
             <div id="add_modify_popup">
                 <div>
