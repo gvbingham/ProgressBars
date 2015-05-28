@@ -3,6 +3,11 @@ function toggle_add_popup_display() {
     document.querySelector('#add_modify_popup').style.display = (state == 'none' || state == '') ? 'block' : 'none';
     document.querySelector('#add_modify_container').style.display = (state == 'none' || state == '') ? 'flex' : 'none';
 }
+function toggle_choosecloud_popup_display() {
+    var state = document.querySelector('#add_modify_container').style.display;
+    document.querySelector('#choosecloud_popup').style.display = (state == 'none' || state == '') ? 'block' : 'none';
+    document.querySelector('#choosecloud_container').style.display = (state == 'none' || state == '') ? 'flex' : 'none';
+}
 
 
 function toggle_add_options(whatami) {
