@@ -3,10 +3,10 @@ var SCOPES = 'https://www.googleapis.com/auth/drive.appfolder';
 
 /**
 * Called when the client library is loaded to start the auth flow.
-*/
 function handleClientLoad() {
     window.setTimeout(checkAuth, 1);
 }
+*/
 
 /**
 * Check if the current user has authorized the application.
@@ -46,7 +46,6 @@ function handleAuthResult(authResult) {
         };
     }
 }
-
 
 function get_data_folder_info() {
     var request = gapi.client.drive.files.get({
