@@ -9,7 +9,6 @@ function toggle_choosecloud_popup_display() {
     document.querySelector('#choosecloud_container').style.display = (state == 'none' || state == '') ? 'flex' : 'none';
 }
 
-
 function toggle_add_options(whatami) {
     var iamnot = {
         fieldset_count_up : document.querySelector("#fieldset_count_up"),

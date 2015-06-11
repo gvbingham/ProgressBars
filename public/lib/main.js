@@ -5,6 +5,12 @@
 var BAR = BAR || {
     settings : {
         current_category : 'all',
+        cloud : {
+            google : 0,
+            dropbox : 0,
+            btsync : 0,
+            amazon : 0,
+        },
     },
     bars : [],
 };
