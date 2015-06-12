@@ -13,21 +13,20 @@ function set_app_use_google() {
 
 function load_google_api_client() {
     gapi.client.load('drive', 'v2').then(function() { // pre-load the client
-        //gapi.client.setApiKey(APIKEY);
-        checkAuth();
+        check_auth();
     }); 
 }
 
-function checkAuth() {
+function check_auth() {
     gapi.auth.authorize(
         {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': true},
         handleAuthResult
     );
 }
 
-function insertfile () {
+function create_file (name) {
     var request = gapi.client.drive.files.insert({
-        title : 'app.json',
+        title : name,
         mimeType : 'application/json', 
     });
     request.execute(function(resp) {
@@ -35,7 +34,7 @@ function insertfile () {
     });
 }
 
-function updatefile (json_raw) {
+function update_file (file_name, json_raw) {
     json_str = JSON.stringify(json_raw);
     json_str = btoa(json_str);
 
@@ -43,18 +42,19 @@ function updatefile (json_raw) {
     const delimiter = "\r\n--" + boundary + "\r\n";
     const close_delim = "\r\n--" + boundary + "--";
 
-    var contentType = 'application/json';
+    var content_type = 'application/json';
+    
     var metadata = {
-      'title': 'testzing',
-      'mimeType': contentType
+      'title': file_name,
+      'mimeType': content_type
     };
 
-    var multipartRequestBody =
+    var multipart_request_body =
         delimiter +
         'Content-Type: application/json\r\n\r\n' +
         JSON.stringify(metadata) +
         delimiter +
-        'Content-Type: ' + contentType + '\r\n' +
+        'Content-Type: ' + content_type + '\r\n' +
         'Content-Transfer-Encoding: base64\r\n' +
         '\r\n' +
         json_str +
@@ -67,7 +67,7 @@ function updatefile (json_raw) {
         'headers': {
           'Content-Type': 'multipart/mixed; boundary="' + boundary + '"'
         },
-        'body': multipartRequestBody
+        'body': multipart_request_body
     });
 
     request.execute(function(data) {
