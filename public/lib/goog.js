@@ -13,45 +13,65 @@ function set_app_use_google() {
 
 function load_google_api_client() {
     gapi.client.load('drive', 'v2').then(function() { // pre-load the client
-        //gapi.client.setApiKey(APIKEY);
-        checkAuth();
+        check_auth();
     }); 
 }
 
-function checkAuth() {
+function check_auth() {
     gapi.auth.authorize(
         {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': true},
         handleAuthResult
     );
 }
 
-function insertfile () {
+function create_file (name) {
     var request = gapi.client.drive.files.insert({
-        title : 'app.json',
+        title : name,
         mimeType : 'application/json', 
     });
     request.execute(function(resp) {
         BAR.settings.app_file_id = resp.id;
-        console.log(resp.id)
     });
 }
 
-function updatefile () {
-    var json = {a:1, b:2};
-    json = JSON.stringify(json);
-    json = btoa(json);
-    var http_text = 'Content-Type: application/json\r\n' +
+function update_file (file_name, json_raw) {
+    json_str = JSON.stringify(json_raw);
+    json_str = btoa(json_str);
+
+    const boundary = '-------314159265358979323846';
+    const delimiter = "\r\n--" + boundary + "\r\n";
+    const close_delim = "\r\n--" + boundary + "--";
+
+    var content_type = 'application/json';
+    
+    var metadata = {
+      'title': file_name,
+      'mimeType': content_type
+    };
+
+    var multipart_request_body =
+        delimiter +
+        'Content-Type: application/json\r\n\r\n' +
+        JSON.stringify(metadata) +
+        delimiter +
+        'Content-Type: ' + content_type + '\r\n' +
         'Content-Transfer-Encoding: base64\r\n' +
         '\r\n' +
-        json;
-    console.log(http_text);
-    var request = gapi.client.drive.files.update({
-        fileId : BAR.settings.app_file_id,
-        uploadType : 'media',
-        body : http_text,
+        json_str +
+        close_delim;
+
+    var request = gapi.client.request({
+        'path': '/upload/drive/v2/files',
+        'method': 'POST',
+        'params': {'uploadType': 'multipart'},
+        'headers': {
+          'Content-Type': 'multipart/mixed; boundary="' + boundary + '"'
+        },
+        'body': multipart_request_body
     });
-    request.execute(function(resp) {
-        console.log(resp)
+
+    request.execute(function(data) {
+        console.log(data);
     });
 }
 
