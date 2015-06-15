@@ -11,6 +11,7 @@ var BAR = BAR || {
             btsync : 0,
             amazon : 0,
         },
+        goog : {},
     },
     bars : [],
 };

@@ -3,40 +3,31 @@ var APIKEY = 'AIzaSyC9ygrH_0wszsBc6xxV9lXGLuDikDKiSio'; //maybe don't need
 var SCOPES = ['https://www.googleapis.com/auth/drive.appfolder', 'https://www.googleapis.com/auth/drive.file'];
 
 
-function set_app_use_google() {
+function goog_set_up_app() {
     if (BAR.settings.cloud.google != 1) { // set persistent user uses google drive
         BAR.settings.cloud.google = 1; 
         save_local();
     }
     if (gapi.client.drive == undefined) {
-        load_google_api_client();
+        goog_load_google_api_client();
     }
 }
 
-function load_google_api_client() {
+function goog_load_google_api_client() {
     gapi.client.load('drive', 'v2').then(function() { // pre-load the client
-        check_auth();
+        goog_check_auth();
     }); 
 }
 
-function check_auth() {
+function goog_check_auth() {
     gapi.auth.authorize(
         {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': true},
         handleAuthResult
     );
 }
 
-function create_file (file_name) {
-    var request = gapi.client.drive.files.insert({
-        title : name,
-        mimeType : 'application/json', 
-    });
-    request.execute(function(resp) {
-        BAR.settings.app_file_id = resp.id;
-    });
-}
 
-function create_or_update_file (json_raw) {
+function goog_create_or_update_app_folder_file (json_raw) {
     // json handling for json_raw argument
     var json_str = JSON.stringify(json_raw);
     json_str = btoa(json_str);
@@ -79,8 +70,8 @@ function create_or_update_file (json_raw) {
         },
         'body': multipart_request_body
     };
-    if (BAR.settings.app_file_id) { // if file does exist or application does know about the file 
-        request_obj.path = '/upload/drive/v2/files/' + BAR.settings.app_file_id;
+    if (BAR.settings.goog.app_file_id) { // if file does exist or application does know about the file 
+        request_obj.path = '/upload/drive/v2/files/' + BAR.settings.goog.app_file_id;
         request_obj.method = 'PUT';
         request_obj.params.alt = 'json';
     }
@@ -92,22 +83,22 @@ function create_or_update_file (json_raw) {
 
     //execute the request and do something after
     request.execute(function(data) {
-        BAR.settings.app_file_id = data.id;
+        BAR.settings.goog.app_file_id = data.id;
         console.log(data);
     });
 }
 
-function get_app_folder_info () { // working
+function goog_get_app_folder_info () { // working
     var request = gapi.client.drive.files.get({
         'fileId': 'appfolder'
     });
     request.execute(function(resp) {
-        BAR.settings.app_folder_id = resp.id;
-        BAR.settings.app_folder_title = resp.title;
+        BAR.settings.goog.app_folder_id = resp.id;
+        BAR.settings.goog.app_folder_title = resp.title;
     });
 }
 
-function get_app_folder_list () { // working
+function goog_get_app_folder_list () { // working
     var request = gapi.client.drive.files.list({
         'q': '\'appfolder\' in parents'
     });
@@ -116,16 +107,18 @@ function get_app_folder_list () { // working
     });
 }
 
-function app_file_get (file_id) { // get the contents.
+function goog_app_file_get (file_id) { // get the contents.
     var request = gapi.client.drive.files.get({
-        'fileId': file_id
+        'fileId': file_id,
+        'alt' : 'media'
     });
     request.execute(function(resp) {
+        BAR.settings.goog.content = resp.result;
         console.log(resp)
     });
 }
 
-function app_file_delete (file_id) {// working
+function goog_app_file_delete (file_id) {// working
     var request = gapi.client.drive.files.delete({
         'fileId': file_id
     });
@@ -150,3 +143,15 @@ function handleAuthResult(authResult) {
         );
     }
 }
+
+/*
+function create_file (file_name) { // not in use
+    var request = gapi.client.drive.files.insert({
+        title : name,
+        mimeType : 'application/json', 
+    });
+    request.execute(function(resp) {
+        BAR.settings.app_file_id = resp.id;
+    });
+}
+*/
