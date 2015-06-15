@@ -8,7 +8,9 @@ function set_app_use_google() {
         BAR.settings.cloud.google = 1; 
         save_local();
     }
-    load_google_api_client();
+    if (gapi.client.drive == undefined) {
+        load_google_api_client();
+    }
 }
 
 function load_google_api_client() {
@@ -24,7 +26,7 @@ function check_auth() {
     );
 }
 
-function create_file (name) {
+function create_file (file_name) {
     var request = gapi.client.drive.files.insert({
         title : name,
         mimeType : 'application/json', 
@@ -34,33 +36,41 @@ function create_file (name) {
     });
 }
 
-function update_file (file_name, json_raw) {
-    json_str = JSON.stringify(json_raw);
+function create_or_update_file (json_raw) {
+    // json handling for json_raw argument
+    var json_str = JSON.stringify(json_raw);
     json_str = btoa(json_str);
 
+    
+    // Imutable data for header construction
     const boundary = '-------314159265358979323846';
     const delimiter = "\r\n--" + boundary + "\r\n";
     const close_delim = "\r\n--" + boundary + "--";
 
-    var content_type = 'application/json';
-    
+
+    // metadata needed for more header construction
     var metadata = {
-      'title': file_name,
-      'mimeType': content_type
+      'title': 'app.json',
+      'mimeType': 'application/json',
+      'parents' : [{'id' : 'appfolder'}]
     };
 
+
+    // more header construction 
     var multipart_request_body =
         delimiter +
         'Content-Type: application/json\r\n\r\n' +
         JSON.stringify(metadata) +
         delimiter +
-        'Content-Type: ' + content_type + '\r\n' +
+        'Content-Type: application/json\r\n' +
         'Content-Transfer-Encoding: base64\r\n' +
         '\r\n' +
         json_str +
         close_delim;
 
-    var request = gapi.client.request({
+
+    // and even more construction 
+    var request_obj = {
         'path': '/upload/drive/v2/files',
         'method': 'POST',
         'params': {'uploadType': 'multipart'},
@@ -68,14 +78,26 @@ function update_file (file_name, json_raw) {
           'Content-Type': 'multipart/mixed; boundary="' + boundary + '"'
         },
         'body': multipart_request_body
-    });
+    };
+    if (BAR.settings.app_file_id) { // if file does exist or application does know about the file 
+        request_obj.path = '/upload/drive/v2/files/' + BAR.settings.app_file_id;
+        request_obj.method = 'PUT';
+        request_obj.params.alt = 'json';
+    }
 
+    console.log(request_obj); //debug
+
+    // load up the request into the client
+    var request = gapi.client.request(request_obj);
+
+    //execute the request and do something after
     request.execute(function(data) {
+        BAR.settings.app_file_id = data.id;
         console.log(data);
     });
 }
 
-function get_app_folder_info () {
+function get_app_folder_info () { // working
     var request = gapi.client.drive.files.get({
         'fileId': 'appfolder'
     });
@@ -85,27 +107,27 @@ function get_app_folder_info () {
     });
 }
 
-function get_app_folder_list () {
+function get_app_folder_list () { // working
     var request = gapi.client.drive.files.list({
         'q': '\'appfolder\' in parents'
     });
     request.execute(function(resp) {
-        console.log(resp)
+        console.log(resp.items);
     });
 }
 
-function get_app_folder_get () {
+function app_file_get (file_id) { // get the contents.
     var request = gapi.client.drive.files.get({
-        'fileId': '1ueAfvEANqas_9ggkgxqkAqbh3ZxdoevAMjESjXIwCywZ'
+        'fileId': file_id
     });
     request.execute(function(resp) {
         console.log(resp)
     });
 }
 
-function get_app_folder_delete () {
-    var request = gapi.client.drive.files.get({
-        'fileId': '1ueAfvEANqas_9ggkgxqkAqbh3ZxdoevAMjESjXIwCywZ'
+function app_file_delete (file_id) {// working
+    var request = gapi.client.drive.files.delete({
+        'fileId': file_id
     });
     request.execute(function(resp) {
         console.log(resp)
@@ -127,12 +149,4 @@ function handleAuthResult(authResult) {
             handleAuthResult
         );
     }
-}
-
-function put_app_file() {
-
-}
-
-function read_app_file() {
-
 }

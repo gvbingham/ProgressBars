@@ -11,7 +11,6 @@ function save_local() {
     localStorage.Bars = JSON.stringify(BAR.bars);
     localStorage.settings = JSON.stringify(BAR.settings);
 }
-
 function sync() { //used to get all cloud items and local storage. compare them, and make a decision.
     var localdata = function () {
         var temp = {};
