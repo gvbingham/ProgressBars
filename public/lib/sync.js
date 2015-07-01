@@ -8,10 +8,21 @@ function get_local_settings() {
 }
 
 function save_local() {
-    localStorage.Bars = JSON.stringify(BAR.bars);
+    localStorage.bars = JSON.stringify(BAR.bars);
     localStorage.settings = JSON.stringify(BAR.settings);
 }
-function sync() { //used to get all cloud items and local storage. compare them, and make a decision.
+
+function onload_sync() { //initial update of local memory from local Storage
+    if (localStorage.bars != undefined) {
+        BAR.bars = get_local_bars(); 
+    }
+    if (localStorage.settings != undefined) {
+        BAR.settings = get_local_settings();
+    }
+    sync();
+}
+
+function sync() {//used to get all cloud items and local storage. compare them, and make a decision.
     var localdata = function () {
         var temp = {};
         temp.bars = get_local_bars();
@@ -26,4 +37,3 @@ function sync() { //used to get all cloud items and local storage. compare them,
     // Need to get this working for google api's this little guy will load the client so you can do things like gapi.client.drive.files
     //populate_category_header();
 }
-
