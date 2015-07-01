@@ -134,7 +134,7 @@ function handleAuthResult(authResult) {
     filePicker.style.display = 'none';
     */
     if (authResult && !authResult.error) {
-        get_app_folder_info();
+        goog_get_app_folder_info();
     }
     else {
         gapi.auth.authorize(
