@@ -4,19 +4,20 @@ var SCOPES = ['https://www.googleapis.com/auth/drive.appfolder', 'https://www.go
 
 
 function goog_set_up_app() {
-    if (BAR.settings.cloud.google != 1) { // set persistent user uses google drive
-        BAR.settings.cloud.google = 1; 
-        save_local();
-    }
-    if (gapi.client.drive == undefined) {
-        goog_load_google_api_client();
-    }
+    BAR.settings.cloud.google = 1; 
+    save_local();
+    goog_load_google_api_client();
 }
 
 function goog_load_google_api_client() {
-    gapi.client.load('drive', 'v2').then(function() { // pre-load the client
+    if (gapi.client.drive == undefined) { // if not already loaded
+        gapi.client.load('drive', 'v2').then(function() { // pre-load the client
+            goog_check_auth();
+        }); 
+    }
+    else {
         goog_check_auth();
-    }); 
+    }
 }
 
 function goog_check_auth() {
@@ -28,6 +29,7 @@ function goog_check_auth() {
 
 
 function goog_create_or_update_app_folder_file (json_raw) {
+    json_raw = jason_raw || BAR;
     // json handling for json_raw argument
     var json_str = JSON.stringify(json_raw);
     json_str = btoa(json_str);
@@ -108,6 +110,7 @@ function goog_get_app_folder_list () { // working
 }
 
 function goog_app_file_get (file_id) { // get the contents.
+    file_id = file_id || BAR.settings.goog.app_file_id;
     var request = gapi.client.drive.files.get({
         'fileId': file_id,
         'alt' : 'media'
@@ -119,6 +122,7 @@ function goog_app_file_get (file_id) { // get the contents.
 }
 
 function goog_app_file_delete (file_id) {// working
+    file_id = file_id || BAR.settings.goog.app_file_id;
     var request = gapi.client.drive.files.delete({
         'fileId': file_id
     });
@@ -143,15 +147,3 @@ function handleAuthResult(authResult) {
         );
     }
 }
-
-/*
-function create_file (file_name) { // not in use
-    var request = gapi.client.drive.files.insert({
-        title : name,
-        mimeType : 'application/json', 
-    });
-    request.execute(function(resp) {
-        BAR.settings.app_file_id = resp.id;
-    });
-}
-*/
