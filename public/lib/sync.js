@@ -1,6 +1,6 @@
 //Sync is needing to be more module if you will use this outside of this project.
 function get_local_bars() {
-    return JSON.parse(localStorage.Bars);
+    return JSON.parse(localStorage.bars);
 }
 
 function get_local_settings() {
@@ -17,7 +17,6 @@ function save_local() {
     localStorage.bars = JSON.stringify(BAR.bars);
     localStorage.settings = JSON.stringify(BAR.settings);
     localStorage.stamp = now;
-    sync();
 }
 
 function onload_sync() { //initial update of local memory from local Storage
@@ -30,7 +29,9 @@ function onload_sync() { //initial update of local memory from local Storage
     if (localStorage.stamp != undefined) {
         BAR.stamp = get_local_stamp();
     }
-    sync();
+    if (BAR.settings.cloud.google == 1) {
+        goog_set_up_app(); 
+    }
 }
 
 function sync() {//used to get all cloud items and local storage. compare them, and make a decision.

@@ -1,4 +1,3 @@
-
 ///////////////////
 // BAR Functions //
 ///////////////////
@@ -11,9 +10,9 @@ var BAR = BAR || {
             btsync : 0,
             amazon : 0,
         },
-        goog : {},
     },
     bars : [],
+    goog : {},
 };
 var data = {
     char_set : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
@@ -93,9 +92,10 @@ function get_categories_list() {
     return temp_array;
 }
 
-function create_id() { //create id like 
+function create_id(num) { //create id like 
+    num = num || 5;
     var tmp_string = '';
-    for(var i = 0; i <= 5; i++){
+    for(var i = 0; i <= num; i++){
         tmp_string += data.char_set.charAt(Math.floor(Math.random() * 62));
     } 
     return tmp_string;
