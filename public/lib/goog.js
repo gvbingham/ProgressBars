@@ -29,6 +29,7 @@ function goog_check_auth() {
 
 function goog_create_or_update_app_folder_file (json_raw) {
     json_raw = json_raw || BAR;
+    json_raw.stamp = Date.now();
     // json handling for json_raw argument
     var json_str = JSON.stringify(json_raw);
     json_str = btoa(json_str);
@@ -141,6 +142,7 @@ function goog_app_file_get (file_id) { // get the contents.
     });
     request.execute(function(resp) {
         BAR.goog.content = resp.result;
+        sync();
     });
 }
 

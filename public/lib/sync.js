@@ -1,4 +1,19 @@
 //Sync is needing to be more module if you will use this outside of this project.
+function onload_sync() { //initial update of local memory from local Storage
+    if (localStorage.bars != undefined) {
+        BAR.bars = get_local_bars(); 
+    }
+    if (localStorage.settings != undefined) {
+        BAR.settings = get_local_settings();
+    }
+    if (localStorage.stamp != undefined) {
+        BAR.stamp = get_local_stamp();
+    }
+    if (BAR.settings.cloud.google == 1) {
+        goog_set_up_app(); 
+    }
+}
+
 function get_local_bars() {
     return JSON.parse(localStorage.bars);
 }
@@ -19,32 +34,17 @@ function save_local() {
     localStorage.stamp = now;
 }
 
-function onload_sync() { //initial update of local memory from local Storage
-    if (localStorage.bars != undefined) {
-        BAR.bars = get_local_bars(); 
-    }
-    if (localStorage.settings != undefined) {
-        BAR.settings = get_local_settings();
-    }
-    if (localStorage.stamp != undefined) {
-        BAR.stamp = get_local_stamp();
-    }
-    if (BAR.settings.cloud.google == 1) {
-        goog_set_up_app(); 
-    }
-}
-
 function sync() {//used to get all cloud items and local storage. compare them, and make a decision.
     if (BAR.settings.cloud.google == 1) {
-        goog_app_file_get(function (){
-            var goog = BAR.settings.goog.content;
-            function goog_wins() {
-                if (goog.stamp > BAR.stamp) {//Google Wins
-                    BAR = BAR.settings.goog.content
-                }
-            }
-        });
+        var goog = BAR.goog.content;
+        if (goog.stamp > BAR.stamp) {//Google Wins
+            BAR = BAR.settings.goog.content
+        }
+        else if (goog.stamp < BAR.stamp) {
+            goog_create_or_update_app_folder_file();
+        }
     }
+    save_local(); 
 
     data.need_refresh = true; // what do I do again? 
 
