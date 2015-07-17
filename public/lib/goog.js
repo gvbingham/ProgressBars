@@ -5,6 +5,7 @@ var SCOPES = ['https://www.googleapis.com/auth/drive.appfolder', 'https://www.go
 
 function goog_set_up_app() {
     BAR.settings.cloud.google = 1; 
+    save_local();
     goog_load_google_api_client();
 }
 
@@ -26,6 +27,47 @@ function goog_check_auth() {
     );
 }
 
+function handleAuthResult(authResult) {
+    /*var authButton = document.getElementById('authorizeButton');
+    var filePicker = document.getElementById('filePicker');
+    authButton.style.display = 'none';
+    filePicker.style.display = 'none';
+    */
+    if (authResult && !authResult.error) {
+        goog_get_app_folder_info();
+        goog_get_app_file_id();
+    }
+    else {
+        gapi.auth.authorize(
+            {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': false},
+            handleAuthResult
+        );
+    }
+}
+
+function goog_get_app_folder_info () { // working
+    var request = gapi.client.drive.files.get({
+        'fileId': 'appfolder'
+    });
+    request.execute(function(resp) {
+        data.goog.app_folder_id = resp.id;
+        data.goog.app_folder_title = resp.title; // may not be needed
+    });
+}
+
+function goog_get_app_file_id () { // working
+    var request = gapi.client.drive.files.list({
+        'q': '\'appfolder\' in parents'
+    });
+    request.execute(function(resp) {
+        if (resp.items.length <= 0) {
+            goog_create_or_update_app_folder_file(); 
+        }
+        else {
+            data.goog.app_file_id = resp.items[0]['id'];
+        }
+    });
+}
 
 function goog_create_or_update_app_folder_file (json_raw) {
     json_raw = json_raw || BAR;
@@ -72,21 +114,19 @@ function goog_create_or_update_app_folder_file (json_raw) {
         },
         'body': multipart_request_body
     };
-    if (BAR.goog.app_file_id) { // if file does exist or application does know about the file 
-        request_obj.path = '/upload/drive/v2/files/' + BAR.goog.app_file_id;
+    if (data.goog.app_file_id) { // if file does exist or application does know about the file 
+        request_obj.path = '/upload/drive/v2/files/' + data.goog.app_file_id;
         request_obj.method = 'PUT';
         request_obj.params.alt = 'json';
     }
-
-    console.log(request_obj); //debug
 
     // load up the request into the client
     var request = gapi.client.request(request_obj);
 
     //execute the request and do something after
-    request.execute(function(data) {
-        BAR.goog.app_file_id = data.id;
-        console.log(data);
+    request.execute(function(obj) {
+        data.goog.app_file_id = obj.id;
+        console.log(obj);
     });
 }
 
@@ -101,29 +141,6 @@ function goog_watch_file_by_id (fileId) { //https://developers.google.com/drive/
     request.execute(function(channel){console.log(channel);}); 
 }
 
-function goog_get_app_folder_info () { // working
-    var request = gapi.client.drive.files.get({
-        'fileId': 'appfolder'
-    });
-    request.execute(function(resp) {
-        BAR.goog.app_folder_id = resp.id;
-        BAR.goog.app_folder_title = resp.title;
-    });
-}
-
-function goog_get_app_file_id () { // working
-    var request = gapi.client.drive.files.list({
-        'q': '\'appfolder\' in parents'
-    });
-    request.execute(function(resp) {
-        if (resp.items.length <= 0) {
-            goog_create_or_update_app_folder_file(); 
-        }
-        else {
-            BAR.goog.app_file_id = resp.items[0]['id'];
-        }
-    });
-}
 
 function goog_get_app_folder_list () { // working
     var request = gapi.client.drive.files.list({
@@ -135,42 +152,23 @@ function goog_get_app_folder_list () { // working
 }
 
 function goog_app_file_get (file_id) { // get the contents.
-    file_id = file_id || BAR.goog.app_file_id;
+    file_id = file_id || data.goog.app_file_id;
     var request = gapi.client.drive.files.get({
         'fileId': file_id,
         'alt' : 'media'
     });
     request.execute(function(resp) {
-        BAR.goog.content = resp.result;
-        sync();
+        data.goog.content = resp.result;
     });
 }
 
 function goog_app_file_delete (file_id) {// working
-    file_id = file_id || BAR.goog.app_file_id;
+    file_id = file_id || data.goog.app_file_id;
     var request = gapi.client.drive.files.delete({
         'fileId': file_id
     });
     request.execute(function(resp) {
-        BAR.goog.app_file_id = undefined;
+        data.goog.app_file_id = undefined;
         console.log(resp)
     });
-}
-
-function handleAuthResult(authResult) {
-    /*var authButton = document.getElementById('authorizeButton');
-    var filePicker = document.getElementById('filePicker');
-    authButton.style.display = 'none';
-    filePicker.style.display = 'none';
-    */
-    if (authResult && !authResult.error) {
-        goog_get_app_folder_info();
-        goog_get_app_file_id();
-    }
-    else {
-        gapi.auth.authorize(
-            {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': false},
-            handleAuthResult
-        );
-    }
 }

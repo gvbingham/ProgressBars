@@ -12,7 +12,6 @@ var BAR = BAR || {
         },
     },
     bars : [],
-    goog : {},
 };
 var data = {
     char_set : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
@@ -36,6 +35,7 @@ var data = {
         {scope : 'Years',   value : 31536000, cap : 55},
     ],
     need_refresh : true,
+    goog : {},
 };
 
 data.fib_values = (function () {
@@ -60,6 +60,7 @@ function create_bar(args) {
     this.description = args.description || null;
     this.category    = args.category || 'main';
     this.created     = args.created || time;
+    this.updated     = args.updated || time;
     this.stamp       = args.created || time;
     this.history     = args.history || []; 
     this.type        = args.type || 'count_down';
