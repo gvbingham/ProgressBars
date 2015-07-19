@@ -37,7 +37,7 @@ function save_local() {
 function sync() {//used to get all cloud items and local storage. compare them, and make a decision.
     if (BAR.settings.cloud.google == 1) {
         var request = gapi.client.drive.files.get({
-            'fileId': BAR.goog.app_file_id,
+            'fileId': data.goog.app_file_id,
             'alt' : 'media'
         });
         request.execute(function(resp) {
@@ -53,9 +53,7 @@ function sync() {//used to get all cloud items and local storage. compare them, 
         save_local();
     }
 
-    data.need_refresh = true; // what do I do again? 
-
-    // Need to get this working for google api's this little guy will load the client so you can do things like gapi.client.drive.files
+    data.need_refresh = true; // display needs me to know when to rebuild the whole bar layout and order
     //populate_category_header();
 }
 

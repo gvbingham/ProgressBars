@@ -115,7 +115,7 @@ function delete_bar (id) {
     //put if statement on if not found
     BAR.bars.splice(index, 1);
     data.need_refresh = true;
-    save_local();
+    sync();
     return BAR.bars;
 }
 
@@ -128,7 +128,8 @@ function update_bar (id, args) {
             my_bar[key] = args[key];
         }
     }
-    save_local();
+    my_bar.updated = get_time();
+    sync();
     return my_bar;
 }
 
@@ -199,13 +200,13 @@ function get_target_seconds(date, time) {
 
 function sort_execute (arr, type) {
     BAR.bars = sort_array(arr, type);
-    save_local();
+    sync();
     data.need_refresh = true;
 }
 
 function change_category(new_category) {
    BAR.settings.current_category = new_category;
-   save_local();
+   sync();
    data.need_refresh = true;
 }
 

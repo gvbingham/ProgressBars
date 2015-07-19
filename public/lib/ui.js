@@ -48,7 +48,7 @@ function add() { //revisit fix
         temp_bar.type = "count_up";
     }
     BAR.bars.push(new create_bar(temp_bar));
-    save_local();
+    sync();
     data.need_refresh = true;
     reset_form();
 }

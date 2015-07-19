@@ -5,7 +5,6 @@ var SCOPES = ['https://www.googleapis.com/auth/drive.appfolder', 'https://www.go
 
 function goog_set_up_app() {
     BAR.settings.cloud.google = 1; 
-    save_local();
     goog_load_google_api_client();
 }
 
@@ -127,6 +126,7 @@ function goog_create_or_update_app_folder_file (json_raw) {
     request.execute(function(obj) {
         data.goog.app_file_id = obj.id;
         console.log(obj);
+        goog_app_file_get();
     });
 }
 
@@ -159,6 +159,7 @@ function goog_app_file_get (file_id) { // get the contents.
     });
     request.execute(function(resp) {
         data.goog.content = resp.result;
+        sync();
     });
 }
 
