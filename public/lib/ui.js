@@ -1,12 +1,25 @@
 function toggle_add_popup_display() {
     var state = document.querySelector('#add_modify_container').style.display;
     document.querySelector('#add_modify_popup').style.display = (state == 'none' || state == '') ? 'block' : 'none';
+    document.querySelector('#lightboxBG').style.display = (state == 'none' || state == '') ? 'block' : 'none';
     document.querySelector('#add_modify_container').style.display = (state == 'none' || state == '') ? 'flex' : 'none';
 }
 function toggle_choosecloud_popup_display() {
-    var state = document.querySelector('#add_modify_container').style.display;
+    var state = document.querySelector('#choosecloud_container').style.display;
     document.querySelector('#choosecloud_popup').style.display = (state == 'none' || state == '') ? 'block' : 'none';
+    document.querySelector('#lightboxBG').style.display = (state == 'none' || state == '') ? 'block' : 'none';
     document.querySelector('#choosecloud_container').style.display = (state == 'none' || state == '') ? 'flex' : 'none';
+}
+
+function cancel_hide_popups() {
+    var add = document.querySelector('#add_modify_popup').style.display;
+    var cloud = document.querySelector('#choosecloud_popup').style.display;
+    if (add == 'block') {
+        toggle_add_popup_display();
+    }
+    if (cloud == 'block') {
+        toggle_choosecloud_popup_display(); 
+    }
 }
 
 function toggle_add_options(whatami) {
