@@ -64,6 +64,7 @@ function goog_get_app_file_id () { // working
         }
         else {
             data.goog.app_file_id = resp.items[0]['id'];
+            goog_app_file_get();
         }
     });
 }
@@ -126,28 +127,7 @@ function goog_create_or_update_app_folder_file (json_raw) {
     request.execute(function(obj) {
         data.goog.app_file_id = obj.id;
         console.log(obj);
-        goog_app_file_get();
-    });
-}
-
-function goog_watch_file_by_id (fileId) { //https://developers.google.com/drive/web/push
-    fileId = fileId || BAR.goog.app_file_id;
-    var resource = {
-        'id': create_id(24),
-        'type': 'web_hook',
-        'address': 'https://geek-pixel.com/bars/public/'
-    };
-    var request = gapi.client.drive.files.watch({'fileId': fileId, 'resource': resource});
-    request.execute(function(channel){console.log(channel);}); 
-}
-
-
-function goog_get_app_folder_list () { // working
-    var request = gapi.client.drive.files.list({
-        'q': '\'appfolder\' in parents'
-    });
-    request.execute(function(resp) {
-        return resp.items;
+        //goog_app_file_get();
     });
 }
 
@@ -173,3 +153,24 @@ function goog_app_file_delete (file_id) {// working
         console.log(resp)
     });
 }
+
+function goog_get_app_folder_list () { // working
+    var request = gapi.client.drive.files.list({
+        'q': '\'appfolder\' in parents'
+    });
+    request.execute(function(resp) {
+        return resp.items;
+    });
+}
+
+function goog_watch_file_by_id (fileId) { //https://developers.google.com/drive/web/push
+    fileId = fileId || BAR.goog.app_file_id;
+    var resource = {
+        'id': create_id(24),
+        'type': 'web_hook',
+        'address': 'https://geek-pixel.com/bars/public/'
+    };
+    var request = gapi.client.drive.files.watch({'fileId': fileId, 'resource': resource});
+    request.execute(function(channel){console.log(channel);}); 
+}
+

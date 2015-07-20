@@ -8,27 +8,28 @@
     <script src="lib/sync.js"></script>
     <script src="lib/goog.js"></script>
     <link rel="stylesheet" type="text/css" href="styles/main.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <html>
       <head>
         <script type="text/javascript" src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
       </head>
     <body>
         <div id="header_container">
-            <div id="left_header"><input type="image" src="img/plus.png" height="30px" alt="Add Bar" id="add_button" onclick="toggle_add_popup_display()"></input></div>
+            <div id="left_header"><span class="fa fa-plus-square fa-2x" onclick="toggle_add_popup_display()" alt="Add Bar" id="add_button"></span></div>
             <div id="center_header">
                 Category : 
                 <select id="select_category" onchange="change_category(this.value);">
                    <!-- populated with categories see display(); -->
                 </select>
             </div> 
-            <div id="right_header"><input type="image" src="img/cloud.png" alt="choose cloud" onclick="toggle_choosecloud_popup_display()" height="30px"></input> <input type="image" src="img/a.jpg" height="30px" onclick="sort_execute(BAR.bars, 'alpha')" alt="Alpha"></input> <input type="image" src="img/percent.gif" height="30px" onclick="sort_execute(BAR.bars, 'percent')" alt="Percent"></input></div>
+            <div id="right_header"><span class="fa fa-cloud fa-2x" alt="choose cloud" onclick="toggle_choosecloud_popup_display()"></span> <span class="fa fa-sort-alpha-asc fa-2x" onclick="sort_execute(BAR.bars, 'alpha')" alt="Alpha"></span> <span class="fa fa-sort-amount-asc fa-2x" onclick="sort_execute(BAR.bars, 'percent')" alt="Percent"></span></div>
         </div>
         <div id="bars_container"></div> 
             <script id="bar_html" type="text/x-handlebars-template">
                 <div class="bar_container">
                     <div id="title_{{id}}" class="title_container">{{title}}</div>
                     <div id="time_{{id}}" class="remaining_time_container">{{time}}</div>
-                    <div id="action_{{id}}" class="action_container"><input type="image" src="img/check.png" height="20px" alt="OK" onclick="reset_bar('{{id}}')"></input> | <input type="image" src="img/trash.png" height="20px" alt="Delete" onclick="delete_bar('{{id}}')"></input></span></div>
+                    <div id="action_{{id}}" class="action_container"><span class="fa fa-check-square-o" alt="OK" onclick="reset_bar('{{id}}')"></span> | <span class="fa fa-trash" alt="Delete" onclick="delete_bar('{{id}}')"></span></div>
                     <svg id="svg_{{id}}"><g><rect class="bg-bar" width="100%" height="100%" style="fill:{{color}}; stroke-width:1; stroke:rgb(0,0,0)"/></g></svg>
                 </div>
             </script>
