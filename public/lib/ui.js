@@ -69,6 +69,7 @@ function add() { //revisit fix
 function reset_form() {
     document.getElementById('add_modify_popup').style.display = 'none';
     document.getElementById('add_modify_container').style.display = 'none';
+    document.getElementById('lightboxBG').style.display = 'none';
     document.getElementById('input_title').value              = null;
     document.getElementById('input_description').value        = null;
     document.getElementById('input_category').value           = null;
