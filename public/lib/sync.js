@@ -71,7 +71,7 @@ function compare_resolve_JSON () {
             }
         }
         if (exists == false) {
-            BAR.push(goog[goog_index]);    
+            BAR.bars.push(goog[goog_index]);    
         }
         exists = false;
     }
