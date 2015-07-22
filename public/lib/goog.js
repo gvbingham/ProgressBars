@@ -127,7 +127,7 @@ function goog_create_or_update_app_folder_file (json_raw) {
     request.execute(function(obj) {
         data.goog.app_file_id = obj.id;
         console.log(obj);
-        goog_app_file_get();
+        //goog_app_file_get();
     });
 }
 
