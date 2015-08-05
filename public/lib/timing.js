@@ -26,13 +26,13 @@ function one_min() {
 */
 
 function draw() {
-    if (BAR.settings.current_category == BAR.bars[index].category || BAR.settings.current_category == "all") { // if in same category
-	    for (var i in BAR.bars) {
+    for (var i in BAR.bars) {
+	    if (BAR.settings.current_category == BAR.bars[i].category || BAR.settings.current_category == "all") { // if in same category
 	    	get_remaining_seconds(i);
 			update_svg_width(i);
 			update_time_text(i);
-	    }
-	}
+		}
+    }
 }
 
 function update_svg_width(index) {
