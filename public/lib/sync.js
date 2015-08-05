@@ -9,6 +9,7 @@ function onload_sync() { //initial update of local memory from local Storage
     if (localStorage.stamp != undefined) {
         BAR.stamp = get_local_stamp();
     }
+    display();
     if (BAR.settings.cloud.google == 1) {
         goog_set_up_app(); 
     }

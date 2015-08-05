@@ -10,6 +10,7 @@
     <script src="lib/time.js"></script>
     <script src="lib/sync.js"></script>
     <script src="lib/goog.js"></script>
+    <script src="lib/timing.js"></script>
     <link rel="stylesheet" type="text/css" href="styles/main.css">
     <link rel="stylesheet" href="styles/font-awesome-4.3.0/css/font-awesome.min.css">
     <html>
@@ -32,7 +33,7 @@
                 <div class="bar_container">
                     <div id="title_{{id}}" class="title_container">{{title}}</div>
                     <div id="time_{{id}}" class="remaining_time_container">{{time}}</div>
-                    <div id="action_{{id}}" class="action_container"><span class="fa fa-check-square-o fa-lg" alt="OK" onclick="reset_bar('{{id}}')"></span> | <span class="fa fa-trash fa-lg" alt="Delete" onclick="delete_bar('{{id}}')"></span></div>
+                    <div id="action_{{id}}" class="action_container"><span class="fa fa-check-square-o fa-lg" alt="OK" onclick="reset_bar({{position}})"></span> | <span class="fa fa-trash fa-lg" alt="Delete" onclick="delete_bar({{position}})"></span></div>
                     <svg id="svg_{{id}}"><g><rect class="bg-bar" width="100%" height="100%" style="fill:{{color}}; stroke-width:1; stroke:rgb(0,0,0)"/></g></svg>
                 </div>
             </script>
@@ -89,21 +90,7 @@
         <div id="lightboxBG" onclick="cancel_hide_popups()"></div>
         <script>
 (function draw_frame() {
-    if (data.need_refresh) {
-        display(); 
-        data.need_refresh = undefined;
-    }
-    for (var i in BAR.bars) {
-        if (BAR.settings.current_category == BAR.bars[i].category || BAR.settings.current_category == "all") { // if in same category
-            if (document.getElementById('svg_' + BAR.bars[i].id)) {
-                document.getElementById('svg_' + BAR.bars[i].id).style.width = get_percent(i) + '%';
-            }
-            if (document.getElementById('time_' + BAR.bars[i].id)) {
-                document.getElementById('time_' + BAR.bars[i].id).innerHTML = get_relative_time_text(get_remaining_seconds(i));
-            }
-        }
-    }
-    //Draw the recalculation of time
+    hires();
     window.requestAnimationFrame(draw_frame);
 })();
     

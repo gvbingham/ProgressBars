@@ -52,34 +52,59 @@ data.fib_values = (function () {
     return temp;
 })()
 
-function create_bar(args) {
-    if (args === undefined) {args = {}}
-    var time = get_time();
-    this.id          = create_id(); 
-    this.title       = args.title || 'New bar - ' + Math.round(Date.now() / 1000); 
-    this.description = args.description || null;
-    this.category    = args.category || 'main';
-    this.created     = args.created || time;
-    this.updated     = args.updated || time;
-    this.stamp       = args.created || time;
-    this.history     = args.history || []; 
-    this.type        = args.type || 'count_down';
-    this.scope       = args.scope || null;
-    this.value       = args.value || null;
-    this.date        = args.date || null;
-    this.time        = args.time || null;
-    if (this.date && this.time) {
-        this.scope = 'Seconds';    
-        this.value = get_target_seconds(this.date, this.time);
+function create_time_object (reverse) {
+    var scopes = ['Years', 'Months', 'Weeks', 'Days', 'Hours', 'Minutes', 'Seconds'];
+    var values = [31536000, 2628000, 604800, 86400, 3600, 60, 1];
+    var nexts = ['Months', 'Weeks', 'Days', 'Hours', 'Minutes', 'Seconds', null];
+    var caps = [55, 8, 3, 5, 21, 55, 55];
+    var obj = [];
+    for (var index in scopes) {
+        obj.push({
+            'scope' : scopes[index], 
+            'value' : values[index], 
+            'next' : nexts[index], 
+            'caps' : caps[index],
+        });
     }
-    if (this.type == 'count_up') {
+    if (reverse) {
+        obj.reverse(); 
+    }
+    return obj;
+}
+
+function create_bar_common(args) {
+    args = args || {};
+    var time = get_time();
+    var obj = {};
+
+    obj.id          = create_id();
+    obj.title       = args.title       || 'New bar - ' + Math.round(Date.now() / 1000);
+    obj.description = args.description || null;
+    obj.category    = args.category    || 'main';
+    obj.created     = args.created     || time;
+    obj.updated     = args.updated     || time;
+    obj.stamp       = args.created     || time;
+    obj.history     = args.history     || [];
+    obj.type        = args.type        || 'interval';
+    obj.color       = 'blue';
+    if (obj.type == 'interval') {
+        obj.scope    = args.scope || null;
+        obj.value    = args.value || null;
+        obj.time_obj = create_time_object();
+    }
+    else if (obj.type == 'target') {
+        obj.date     = args.date  || null;
+        obj.time     = get_target || null;
+        obj.scope    = 'Seconds';
+        obj.value    = get_target_seconds(obj.date, obj.time);
+    }
+    else if (obj.type == 'count_up') {
         this.color = 'lightBlue';
     }
-    else {
-        this.color = 'blue';
-    }
-    this.scope_value = get_scope(this.scope, this.value) || 60 * 5; 
-} 
+    obj.scope_value = get_scope(obj.scope, obj.value) || 60 * 5; //abmiguous possible place for optimization
+
+    return obj;
+}
 
 function get_scope(scope, value) {
     return data.time[scope] * value; 
@@ -110,17 +135,14 @@ function get_index_by_id (id) { //get the index of the bar providing the id of t
     }
 }
 
-function delete_bar (id) {
-    var index = get_index_by_id(id);
-    //put if statement on if not found
+function delete_bar (index) {
     BAR.bars.splice(index, 1);
     data.need_refresh = true;
     sync();
     return BAR.bars;
 }
 
-function update_bar (id, args) {
-    var index = get_index_by_id(id);
+function update_bar (index, args) {
     var my_bar = BAR.bars[index];
     for (var key in args) {
         //Need logic for handing of history (which is an array)
@@ -133,14 +155,15 @@ function update_bar (id, args) {
     return my_bar;
 }
 
-function reset_bar (id) {
+function reset_bar (index) {
     // Need to get if check on 'not found'
-    return update_bar(id, {stamp : Date.now()});
+    BAR.bars[index]['time_obj'] = create_time_object();
+    return update_bar(index, {stamp : Date.now()});
 }
 
 function get_percent (index, sort) {
     var diff = (Date.now() - BAR.bars[index].stamp) / 1000;
-    if (BAR.bars[index].type == 'count_down') {
+    if (BAR.bars[index].type == 'interval') {
         var percent = function () {
             return 100 - (diff / BAR.bars[index].scope_value) * 100;
         }
@@ -234,11 +257,4 @@ function sort_array (arr, type) {
         })
     }
     //TODO Add date added
-}
-
-function get_remaining_seconds(index) {
-    if (BAR.bars[index].type == "count_up") {
-        return (Date.now() - BAR.bars[index].stamp) / 1000;
-    }
-    return Math.floor((BAR.bars[index].stamp / 1000 + BAR.bars[index].scope_value) - (Date.now() / 1000)) 
 }

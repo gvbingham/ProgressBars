@@ -1,37 +1,46 @@
 function get_time() {
     return Date.now();
-} 
-
-function get_relative_time_difference (seconds) {
-    var relative_time = {
-        Years   : 31536000, 
-        Months  : 2628000, 
-        Weeks   : 604800, 
-        Days    : 86400, 
-        Hours   : 3600, 
-        Minutes : 60, 
-        Seconds : 1, 
-    };
-    for (var scope in relative_time) {
-        var scope_seconds = relative_time[scope];
-        if (seconds >= scope_seconds) {
-            relative_time[scope] = Math.floor(seconds / scope_seconds)    
-            seconds = seconds % scope_seconds;
-        } 
-        else {relative_time[scope] = 0}
-    }
-    return relative_time;
 }
 
-function get_relative_time_text (seconds) { //Will convert a number like this 1110203 to something like this "1 Week, 4 Days, 8 Hours, ... " etc.
-    var time_obj = get_relative_time_difference(seconds);
-    var temp_string = '';
-    for (var scope in time_obj) {
-        if (time_obj[scope] != 0) {
-            temp_string += time_obj[scope] + ' ' + scope + ' ';
-        } 
+function get_remaining_seconds(index) {
+    if (BAR.bars[index].type == "count_up") {
+        return (Date.now() - BAR.bars[index].stamp) / 1000;
     }
-    return temp_string;
+    BAR.bars[index]['remaining_seconds'] = Math.floor((BAR.bars[index].stamp / 1000 + BAR.bars[index].scope_value) - (Date.now() / 1000));
+    get_relative_time_text(index);
+} 
+
+function get_relative_time_text(index) {
+    var my_remaining_seconds = BAR.bars[index]['remaining_seconds'];
+    var my_time_obj = BAR.bars[index]['time_obj'];
+    trim_it();
+    function trim_it () {
+        if (my_time_obj.length != 0) { // continue to calculate time_text when there is anything of my_time_obj
+            for (var i in my_time_obj) {
+                if (my_remaining_seconds < my_time_obj[i]['value']) {
+                    my_time_obj.splice(i, 1);
+                    trim_it();
+                }
+                else { // in the case of remaining seconds being greater than the first position of the time_obj
+                    var big_num = Math.floor(my_remaining_seconds / my_time_obj[0]['value']);
+                    var small_num = my_remaining_seconds % my_time_obj[0]['value'];
+                    BAR.bars[index]['time_text'] = big_num + ' '+ my_time_obj[0]['scope'];
+                    if (my_time_obj[1]) { // seems to not be working
+                        small_num = Math.floor(small_num / my_time_obj[1]['value'])
+                        BAR.bars[index]['time_text'] += ' ' + small_num + ' ' + my_time_obj[1]['scope'];
+                    }
+                }
+            }
+        }
+        else { // only fired if the my_time_obj does not exist any longer. (Happens when the remaining seconds is less than 0)
+            // I probably want to get to the point of calculating how much time has elapsed after 0
+            BAR.bars[index]['time_text'] = '';
+        }
+    }
+}
+
+function reset_time_obj(index) {
+    BAR.bars[index]['time_obj'] = create_time_object;
 }
 
 function get_how_many_seconds_to_date (date) {

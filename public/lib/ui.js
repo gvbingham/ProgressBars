@@ -44,23 +44,28 @@ function toggle_add_options(whatami) {
 }
 
 function add() { //revisit fix
-    var temp_bar = { //ok
-        title       : document.getElementById('input_title').value,
-        description : document.getElementById('input_description').value,
-        category    : document.getElementById('input_category').value,
+    var args = function() {
+        var temp_bar = { //ok
+            title       : document.getElementById('input_title').value,
+            description : document.getElementById('input_description').value,
+            category    : document.getElementById('input_category').value,
+        };
+        if (document.getElementById('fieldset_interval').disabled != true) {
+            temp_bar.value = document.getElementById('interval_input_value').value;
+            temp_bar.scope = document.getElementById('scope_dropdown').value;
+            temp_bar.type = 'interval';
+        }
+        else if (document.getElementById('fieldset_target').disabled != true) {
+            temp_bar.date = document.querySelector('#input_date').value;
+            temp_bar.time = document.querySelector('#input_time').value;
+            temp_bar.type = 'target';
+        }
+        else if (document.getElementById('fieldset_count_up').disabled != true) { //get this fixed.
+            temp_bar.type = "count_up";
+        }
+        return temp_bar;
     };
-    if (document.getElementById('fieldset_interval').disabled != true) {
-        temp_bar.value = document.getElementById('interval_input_value').value;
-        temp_bar.scope = document.getElementById('scope_dropdown').value;
-    }
-    else if (document.getElementById('fieldset_target').disabled != true) {
-        temp_bar.date = document.querySelector('#input_date').value;
-        temp_bar.time = document.querySelector('#input_time').value;
-    }
-    else if (document.getElementById('fieldset_count_up').disabled != true) { //get this fixed.
-        temp_bar.type = "count_up";
-    }
-    BAR.bars.push(new create_bar(temp_bar));
+    BAR.bars.push(create_bar_common(args()));
     sync();
     data.need_refresh = true;
     reset_form();
@@ -88,6 +93,7 @@ function display() { //Used to first draw all in the viewed category
     var tmpstring = "";
     for (var i in BAR.bars) {
         if (BAR.bars[i].category === BAR.settings.current_category || BAR.settings.current_category === "all") {
+            BAR.bars[i].position = i;
             tmpstring += template(BAR.bars[i]); 
             //tmpstring += (BAR.bars[i].category == category) ? bar_container + BAR.bars[i].svg + '</div>' : "";
         }
