@@ -27,7 +27,9 @@ function get_relative_time_text(index) {
                     BAR.bars[index]['time_text'] = big_num + ' '+ my_time_obj[0]['scope'];
                     if (my_time_obj[1]) { // seems to not be working
                         small_num = Math.floor(small_num / my_time_obj[1]['value'])
-                        BAR.bars[index]['time_text'] += ' ' + small_num + ' ' + my_time_obj[1]['scope'];
+                        if (small_num != 0) {
+                            BAR.bars[index]['time_text'] += ' ' + small_num + ' ' + my_time_obj[1]['scope'];
+                        }
                     }
                 }
             }

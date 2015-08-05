@@ -67,7 +67,7 @@ function add() { //revisit fix
     };
     BAR.bars.push(create_bar_common(args()));
     sync();
-    data.need_refresh = true;
+    display();
     reset_form();
 }
 
@@ -113,4 +113,10 @@ function display() { //Used to first draw all in the viewed category
         else {tmpstring += '<option value="' + categories[i] + '">' + categories[i] + '</option>';  }
     } 
     document.getElementById("select_category").innerHTML = tmpstring;
+
+    ////////////////////////////////
+    // update one_min and one_sec //
+    ////////////////////////////////
+    one_min();
+    one_sec();
 }

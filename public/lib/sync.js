@@ -53,8 +53,7 @@ function sync() {//used to get all cloud items and local storage. compare them, 
     else {
         save_local();
     }
-
-    data.need_refresh = true; // display needs me to know when to rebuild the whole bar layout and order
+    display();
     //populate_category_header();
 }
 

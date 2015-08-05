@@ -34,7 +34,6 @@ var data = {
         {scope : 'Months',  value : 2628000,  cap : 8},
         {scope : 'Years',   value : 31536000, cap : 55},
     ],
-    need_refresh : true,
     goog : {},
 };
 
@@ -137,7 +136,7 @@ function get_index_by_id (id) { //get the index of the bar providing the id of t
 
 function delete_bar (index) {
     BAR.bars.splice(index, 1);
-    data.need_refresh = true;
+    display();
     sync();
     return BAR.bars;
 }
@@ -224,13 +223,13 @@ function get_target_seconds(date, time) {
 function sort_execute (arr, type) {
     BAR.bars = sort_array(arr, type);
     sync();
-    data.need_refresh = true;
+    display();
 }
 
 function change_category(new_category) {
    BAR.settings.current_category = new_category;
    sync();
-   data.need_refresh = true;
+   display();
 }
 
 function sort_array (arr, type) {
