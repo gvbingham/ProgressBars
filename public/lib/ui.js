@@ -117,6 +117,6 @@ function display() { //Used to first draw all in the viewed category
     ////////////////////////////////
     // update one_min and one_sec //
     ////////////////////////////////
-    one_min();
-    one_sec();
+    //one_min();
+    //one_sec();
 }

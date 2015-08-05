@@ -1,12 +1,8 @@
-var one_sec_function = window.setInterval(one_sec, 1000);
-var one_min_function = window.setInterval(one_min, 60000);
+//var one_sec_function = window.setInterval(one_sec, 1000);
+//var one_min_function = window.setInterval(one_min, 60000);
 
-function one_sec() {
+/*function one_sec() {
 	if (document.readyState == 'complete') {
-	    if (data.need_refresh) {
-	        display(); 
-	        data.need_refresh = undefined;
-	    }
 	    for (var i in BAR.bars) {
 	    	get_remaining_seconds(i);
 	    	if (BAR.bars[i]['remaining_seconds'] <= 86400 && BAR.bars[i]['remaining_seconds'] >= 3600) {
@@ -19,10 +15,6 @@ function one_sec() {
 
 function one_min() {
 	if (document.readyState == 'complete') {
-	    if (data.need_refresh) {
-	        display(); 
-	        data.need_refresh = undefined;
-	    }
 	    for (var i in BAR.bars) {
 	    	if (BAR.bars[i]['remaining_seconds'] >= 86400) {
 	    		update_svg_width(i);
@@ -31,13 +23,13 @@ function one_min() {
 	    }
 	}
 }
+*/
 
-function hires() {
+function draw() {
     for (var i in BAR.bars) {
-        if (BAR.bars[i]['remaining_seconds'] <= 3600) {
-    		update_svg_width(i);
-    		update_time_text(i);
-        }
+    	get_remaining_seconds(i);
+		update_svg_width(i);
+		update_time_text(i);
     }
 }
 
