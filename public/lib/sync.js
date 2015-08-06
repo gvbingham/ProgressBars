@@ -1,30 +1,20 @@
 //Sync is needing to be more module if you will use this outside of this project.
 function onload_sync() { //initial update of local memory from local Storage
-    if (localStorage.bars != undefined) {
-        BAR.bars = get_local_bars(); 
-    }
-    if (localStorage.settings != undefined) {
-        BAR.settings = get_local_settings();
-    }
-    if (localStorage.stamp != undefined) {
-        BAR.stamp = get_local_stamp();
+    var context = ['bars', 'settings', 'stamp'];
+    for (var i in context) {
+        if (localStorage[context[i]] != undefined) {
+            BAR[context[i]] = get_local(context[i]);
+        }
     }
     display();
     if (BAR.settings.cloud.google == 1) {
         goog_set_up_app(); 
+        display();
     }
 }
 
-function get_local_bars() {
-    return JSON.parse(localStorage.bars);
-}
-
-function get_local_settings() {
-    return JSON.parse(localStorage.settings);
-}
-
-function get_local_stamp() {
-    return JSON.parse(localStorage.stamp);
+function get_local(context) { // implement me instead of the 3 stooges below.
+    return JSON.parse(localStorage[context])
 }
 
 function save_local() {
