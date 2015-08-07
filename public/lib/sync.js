@@ -28,6 +28,7 @@ function sync() {//used to get all cloud items and local storage. compare them, 
         });
         request.execute(function(resp) {
             var goog = resp.result;
+            console.log(goog);
             if (goog.stamp > BAR.stamp) {
                 compare_resolve_JSON();
             }
