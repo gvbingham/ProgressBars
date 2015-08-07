@@ -28,9 +28,8 @@ function sync() {//used to get all cloud items and local storage. compare them, 
         });
         request.execute(function(resp) {
             var goog = resp.result;
-            console.log(goog);
             if (goog.stamp > BAR.stamp) {
-                compare_resolve_JSON();
+                compare_resolve_JSON(goog);
             }
             else {
                 goog_create_or_update_app_folder_file();
@@ -45,8 +44,8 @@ function sync() {//used to get all cloud items and local storage. compare them, 
     //populate_category_header();
 }
 
-function compare_resolve_JSON () {
-    var goog = data.goog.content.bars;
+function compare_resolve_JSON(goog) {
+    var goog = goog || data.goog.content.bars;
     var local = BAR.bars;
     var exists = false;
     for (var goog_index in goog) {
