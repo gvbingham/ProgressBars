@@ -1,9 +1,8 @@
-//Sync is needing to be more module if you will use this outside of this project.
 function onload_sync() { //initial update of local memory from local Storage
     var context = ['bars', 'settings', 'stamp'];
     for (var i in context) {
         if (localStorage[context[i]] != undefined) {
-            BAR[context[i]] = get_local(context[i]);
+            BAR[context[i]] = JSON.parse(localStorage[context[i]]);
         }
     }
     display();
@@ -11,10 +10,6 @@ function onload_sync() { //initial update of local memory from local Storage
         goog_set_up_app(); 
         display();
     }
-}
-
-function get_local(context) { // implement me instead of the 3 stooges below.
-    return JSON.parse(localStorage[context])
 }
 
 function save_local() {
@@ -36,8 +31,10 @@ function sync() {//used to get all cloud items and local storage. compare them, 
             if (goog.stamp > BAR.stamp) {
                 compare_resolve_JSON();
             }
-            goog_create_or_update_app_folder_file();
-            save_local(); 
+            else {
+                goog_create_or_update_app_folder_file();
+                save_local();  
+            }
         });
     }
     else {
@@ -65,6 +62,8 @@ function compare_resolve_JSON () {
         }
         exists = false;
     }
+    goog_create_or_update_app_folder_file();
+    save_local(); 
     function resolve(goog_temp, local_temp) {
         if (goog_temp.updated >= local_temp.updated) {
             return goog_temp;//goog wins 
