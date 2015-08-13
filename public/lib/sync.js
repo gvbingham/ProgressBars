@@ -21,6 +21,22 @@ function save_local() {
 }
 
 function sync() {//used to get all cloud items and local storage. compare them, and make a decision.
+    // case stories
+    // 1. computer is only device, no cloud
+    //      a. adds bar refreshes, needs to see bar come back
+    //      b. removes bar refreshes, needs to see bar still removed after refresh
+    //      c. modifies bar, refreshes, needs to see modified bar after refresh.
+    // 2. computer is only device, cloud
+    //      // same as above but with : 
+    //      a. adds bar with internet, refreshes with internet, needs to see utmost bar.
+    //      b. adds bar without internet, refreshes with internet, needs to see the utmost bar.
+    //      c. adds bar with internet, refreshes without internet, needs to see utmost bar.
+    //      d. adds bar without internet, refreshes without internet, needs to see the utmost bar.
+    // 3. computer is not only device,  no cloud
+    //      // same as above but with  : 
+    //      a. adds bar on computer and should see bar updated on phone
+    //      b.   
+    // 4. computer is not only device,  cloud
     if (BAR.settings.cloud.google == 1) {
         var request = gapi.client.drive.files.get({
             'fileId': data.goog.app_file_id,
@@ -31,7 +47,7 @@ function sync() {//used to get all cloud items and local storage. compare them, 
             if (goog.stamp > BAR.stamp) {
                 compare_resolve_JSON(goog);
             }
-            else {
+            else { // is save_local necesary here? 
                 goog_create_or_update_app_folder_file();
                 save_local();  
             }
@@ -39,8 +55,8 @@ function sync() {//used to get all cloud items and local storage. compare them, 
     }
     else {
         save_local();
+        display();
     }
-    display();
     //populate_category_header();
 }
 

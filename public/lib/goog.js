@@ -138,7 +138,7 @@ function goog_app_file_get (file_id) { // get the contents.
         'alt' : 'media'
     });
     request.execute(function(resp) {
-        data.goog.content = resp.result;
+        data.goog.content = resp.result; //Hey you add the data directly to sync(resp.result) and then let sync do the stuff with this. no need to store data after sync is complete anyway lose the data.goog.content 
         sync();
     });
 }

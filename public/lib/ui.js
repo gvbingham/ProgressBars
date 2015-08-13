@@ -66,9 +66,9 @@ function add() { //revisit fix
         return temp_bar;
     };
     BAR.bars.push(create_bar_common(args()));
-    sync();
     display();
     reset_form();
+    sync();
 }
 
 function reset_form() {
