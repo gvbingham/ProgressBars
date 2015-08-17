@@ -35,6 +35,7 @@ var data = {
         {scope : 'Years',   value : 31536000, cap : 55},
     ],
     goog : {},
+    need_sync : false,
 };
 
 data.fib_values = (function () {
@@ -89,19 +90,21 @@ function create_bar_common(args) {
     if (obj.type == 'interval') {
         obj.scope    = args.scope || null;
         obj.value    = args.value || null;
-        obj.time_obj = create_time_object();
     }
     else if (obj.type == 'target') {
         obj.date     = args.date  || null;
-        obj.time     = get_target || null;
+        obj.time     = args.time || null;
         obj.scope    = 'Seconds';
         obj.value    = get_target_seconds(obj.date, obj.time);
     }
     else if (obj.type == 'count_up') {
-        this.color = 'lightBlue';
+        obj.color = 'lightBlue';
+        obj.scope = null;
+        obj.value = null;
     }
+    obj.time_obj = create_time_object();
     obj.scope_value = get_scope(obj.scope, obj.value) || 60 * 5; //abmiguous possible place for optimization
-
+    data.need_sync = true;
     return obj;
 }
 
@@ -134,10 +137,10 @@ function get_index_by_id (id) { //get the index of the bar providing the id of t
     }
 }
 
+
 function delete_bar (index) {
     BAR.bars.splice(index, 1);
-    display();
-    sync();
+    data.need_sync = true;
     return BAR.bars;
 }
 
@@ -150,13 +153,14 @@ function update_bar (index, args) {
         }
     }
     my_bar.updated = get_time();
-    sync();
+    data.need_sync = true;
     return my_bar;
 }
 
 function reset_bar (index) {
     // Need to get if check on 'not found'
     BAR.bars[index]['time_obj'] = create_time_object();
+    data.need_sync = true;
     return update_bar(index, {stamp : Date.now()});
 }
 

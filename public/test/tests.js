@@ -1,4 +1,8 @@
 suite('time.js', function () {
+    suiteSetup(function () {
+        BAR.bars.push( create_bar_common({type : 'interval', scope : 'Years', value : 1}) );
+        get_remaining_seconds(0);
+    });
     suite('get_time', function () {
         test('is a function', function () {
             assert.isFunction(get_time, 'get_time is a function');
@@ -14,11 +18,9 @@ suite('time.js', function () {
         test('is a function', function () {
             assert.isFunction(get_relative_time_text);
         });
-        test('returns a string', function () {
-            assert.isString(get_relative_time_text(100));
-        });
-        test('check with all values with text given 34858861', function () {
-            assert(get_relative_time_text(34858861) == "1 Years 1 Months 1 Weeks 1 Days 1 Hours 1 Minutes 1 Seconds ")
+        test('BAR.bars[0][\'time_text\'] is set and is a string', function () {
+            assert.isString(BAR.bars[0]['time_text']);
+            assert.equal(BAR.bars[0]['time_text'], '11 Months 4 Weeks');
         });
     });
     suite('get_how_many_seconds_to_date', function () {
@@ -48,17 +50,20 @@ suite('time.js', function () {
             assert(get_how_many_seconds_to_time('00:00') == 0);
         });
     });
+    suiteTeardown('', function () {
+        BAR.bars = [];    
+    });
 });
 
 
 suite('main.js', function () {
     suiteSetup(function () {
-        BAR.bars.push( new create_bar({category : 'foo', type : 'count_up'}) );
-        BAR.bars.push( new create_bar({category : 'bar', type : 'count_down'}) );
-        BAR.bars.push( new create_bar({category : 'bar', type : 'reverse_count_down'}) );
-        BAR.bars.push( new create_bar({category : 'bar', type : 'what!'}) );
-        BAR.bars.push( new create_bar({category : 'bar', type : 'count_down', scope : 'Seconds', value : 1, created : 1429912093556}) );
-        BAR.bars.push( new create_bar({category : 'bar', type : 'reverse_count_down', scope : 'Seconds', value : 1, created : 1429912093556}) );
+        BAR.bars.push( new create_bar_common({category : 'foo', type : 'count_up'}) );
+        BAR.bars.push( new create_bar_common({category : 'bar', type : 'count_down'}) );
+        BAR.bars.push( new create_bar_common({category : 'bar', type : 'reverse_count_down'}) );
+        BAR.bars.push( new create_bar_common({category : 'bar', type : 'what!'}) );
+        BAR.bars.push( new create_bar_common({category : 'bar', type : 'count_down', scope : 'Seconds', value : 1, created : 1429912093556}) );
+        BAR.bars.push( new create_bar_common({category : 'bar', type : 'reverse_count_down', scope : 'Seconds', value : 1, created : 1429912093556}) );
     });
     suite('BAR Object', function () {
         test('is an Object', function () {
@@ -108,7 +113,8 @@ suite('main.js', function () {
                     63072000, 94608000, 157680000, 252288000, 409968000,
                     662256000, 1072224000, 1734480000
                 ],
-                need_refresh : true,
+                goog : {},
+                need_sync : true,
             };
             assert.deepEqual(data, temp);
         });
@@ -116,13 +122,15 @@ suite('main.js', function () {
             assert.isString(data.char_set);
             assert.isArray(data.fib);
             assert.isObject(data.time);
+            assert.isObject(data.goog);
             assert.isArray(data.relative_time);
             assert.isArray(data.fib_values);
+            assert.isBoolean(data.need_sync);
         });
     });
     suite('Create a new bar', function () {
         test('create with no arguments', function () {
-            var x = new create_bar(); 
+            var x = create_bar_common(); 
             assert.isObject(x);
             assert.match(x.id, /\w{6}/, 'matches any letter or number 6 places');
             assert.match(x.title, /New bar/, 'title matches \'New bar\'');
@@ -131,22 +139,20 @@ suite('main.js', function () {
             assert.match(x.created, /^\d{13}$/, 'created matches time stamp');
             assert.match(x.stamp, /^\d{13}$/, 'created matches time stamp');
             assert(x.history.length == 0, 'history is an empty array');
-            assert(x.type == 'count_down', 'type is count_down');
+            assert(x.type == 'interval', 'type is interval');
             assert(x.scope == null, 'default scope of null is used');
             assert(x.value == null, 'default value of null is used');
             assert(x.date == null, 'default date of null is used');
             assert(x.time == null, 'default time of null is used');
         });
         test('create with most arguments', function () {
-            var x = new create_bar({
+            var x = create_bar_common({
                 title : 'foo',
                 description : 'bar',
                 category : 'foobar',
                 created : 1429715565899,
                 history : [1, 2, 3, 4, 5],
                 type : 'count_up',
-                scope : 'Seconds',
-                value : 300,
             }); 
             assert.isObject(x);
             assert.match(x.id, /\w{6}/, 'matches any letter or number 6 places');
@@ -157,18 +163,16 @@ suite('main.js', function () {
             assert.match(x.stamp, /^\d{13}$/, 'created matches time stamp');
             assert.isArray(x.history, 'history is an array');
             assert(x.type == 'count_up', 'type is count_up');
-            assert(x.scope == 'Seconds', 'scope is Seconds');
-            assert(x.value == 300, 'value of 300');
             assert(x.color == 'lightBlue');
         });
         test('create with date and time arguments', function () {
-            var x = new create_bar({
+            var x = create_bar_common({
                 title : 'foo',
                 description : 'bar',
                 category : 'foobar',
                 created : 1429715565899,
                 history : [1, 2, 3, 4, 5],
-                type : 'count_down',
+                type : 'target',
                 date : '2015-10-10',
                 time : '20:00',
             }); 
@@ -180,7 +184,7 @@ suite('main.js', function () {
             assert.match(x.created, /^\d{13}$/, 'created matches time stamp');
             assert.match(x.stamp, /^\d{13}$/, 'created matches time stamp');
             assert.isArray(x.history, 'history is an array');
-            assert(x.type == 'count_down', 'type is count_down');
+            assert(x.type == 'target', 'type is target');
             assert(x.scope == 'Seconds', 'scope is Seconds');
             assert(x.value > 0, 'value is greater than 0');
             assert.isNumber(x.value, 'value is a number');
@@ -218,19 +222,19 @@ suite('main.js', function () {
     });
     suite('update_bar', function () {
         test('update_bar can change most items of the bar', function () {
-            assert.propertyVal(update_bar(BAR.bars[1].id, {"id" : "poops"}), "id", "poops");
-            assert.propertyVal(update_bar(BAR.bars[1].id, {"title" : "sy"}), "title", "sy");
-            assert.propertyVal(update_bar(BAR.bars[1].id, {"description" : "Doodle"}), "description", "Doodle");
-            assert.propertyVal(update_bar(BAR.bars[1].id, {"category" : "barz"}), "category", "barz");
-            assert.propertyVal(update_bar(BAR.bars[1].id, {"type" : "count_down"}), "type", "count_down");
-            assert.propertyVal(update_bar(BAR.bars[1].id, {"color" : "Black"}), "color", "Black");
+            assert.propertyVal(update_bar(1, {"id" : "poops"}), "id", "poops");
+            assert.propertyVal(update_bar(1, {"title" : "sy"}), "title", "sy");
+            assert.propertyVal(update_bar(1, {"description" : "Doodle"}), "description", "Doodle");
+            assert.propertyVal(update_bar(1, {"category" : "barz"}), "category", "barz");
+            assert.propertyVal(update_bar(1, {"type" : "count_down"}), "type", "count_down");
+            assert.propertyVal(update_bar(1, {"color" : "Black"}), "color", "Black");
             //TODO need further tests for security and for correct adjustments for each property
         });
     });
     suite('reset_bar', function () {//BROKEN
         test('reset_bar handles count_up type', function () {
-            assert.isNumber(reset_bar(BAR.bars[0].id).stamp);
-            assert.match(reset_bar(BAR.bars[0].id).stamp, /^\d{13}$/);
+            assert.isNumber(reset_bar(0).stamp);
+            assert.match(reset_bar(0).stamp, /^\d{13}$/);
         });
     });
     suite('get_percent', function () {
@@ -239,10 +243,6 @@ suite('main.js', function () {
         });
         test('using count_down', function () {
             assert.closeTo(get_percent(1), 50, 50);
-        });
-        test('using count_down', function () {
-            assert.closeTo(get_percent(1, true), 50, 50);
-            assert.isNumber(BAR.bars[1].percent)
         });
         test('using reverse_count_down', function () {
             assert.closeTo(get_percent(2), 50, 50);
@@ -259,7 +259,7 @@ suite('main.js', function () {
     });
     suite('delete_bar', function () {
         test('delete_bar will delete a bar',  function () {
-            assert(BAR.bars.length - 1 == delete_bar(BAR.bars[3].id).length);
+            assert(BAR.bars.length - 1 == delete_bar(3).length);
         });
     });
     suite('get_unique_category_list', function () {
@@ -267,33 +267,19 @@ suite('main.js', function () {
             assert.deepEqual(get_unique_category_list(), ["bar", "barz", "foo"]);
         });
     });
-    suite('get_remaining_seconds', function () {
-        test('used with count_up', function () {
-            assert.isNumber(get_remaining_seconds(0));
-        });
-        test('used with something other than count_up', function () {
-            assert.isNumber(get_remaining_seconds(1));
-        });
-    });
 });
 
 suite('sync.js', function () {
-    suite('get_local', function () {
-        test('is an array', function () {
-            assert.isArray(get_local());
-        });
-    }); 
+    suite('onload_sync', function () {
+
+    });
     suite('save_local', function () {
-        test('is an array', function () {
-            assert.isString(localStorage.Bars);
-        });
+        
     });
     suite('sync', function () {
-        suiteSetup(function () {
-            sync();    
-        });
-        test('updates', function () {
-            assert(JSON.stringify(BAR.bars) == localStorage.Bars);
-        });
+        
+    });
+    suite('compare_resolve_JSON', function () {
+        
     });
 });
