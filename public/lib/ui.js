@@ -66,9 +66,7 @@ function add() { //revisit fix
         return temp_bar;
     };
     BAR.bars.push(create_bar_common(args()));
-    display();
     reset_form();
-    sync();
 }
 
 function reset_form() {
@@ -84,7 +82,7 @@ function reset_form() {
     document.getElementById('scope_dropdown').selected        = 'Seconds';
 }
 
-function display() { //Used to first draw all in the viewed category
+function refresh_display() { //Used to first draw all in the viewed category
     ////////////////////////
     // Templating of Bars //
     ////////////////////////

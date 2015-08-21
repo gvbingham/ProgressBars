@@ -4,11 +4,14 @@ function onload_sync() { //initial update of local memory from local Storage
         if (localStorage[context[i]] != undefined) {
             BAR[context[i]] = JSON.parse(localStorage[context[i]]);
         }
+        else if (context[i] == 'stamp') {
+            BAR.stamp = 0;
+            localStorage.stamp = 0;
+        }
     }
-    display();
+    data.need_refresh_display = true;
     if (BAR.settings.cloud.google == 1) {
         goog_set_up_app(); 
-        display();
     }
 }
 
@@ -43,9 +46,9 @@ function sync() {//used to get all cloud items and local storage. compare them, 
             'alt' : 'media'
         });
         request.execute(function(resp) {
-            var goog = resp.result;
-            if (goog.stamp > BAR.stamp) {
-                compare_resolve_JSON(goog);
+            data.goog.content = resp.result;
+            if (resp.result.stamp > BAR.stamp) {
+                compare_resolve_JSON();
             }
             else { // is save_local necesary here? 
                 goog_create_or_update_app_folder_file();
@@ -55,13 +58,13 @@ function sync() {//used to get all cloud items and local storage. compare them, 
     }
     else {
         save_local();
-        display();
+        data.refresh_display = true;
     }
     //populate_category_header();
 }
 
-function compare_resolve_JSON(goog) {
-    var goog = goog || data.goog.content.bars;
+function compare_resolve_JSON() {
+    var goog = data.goog.content.bars;
     var local = BAR.bars;
     var exists = false;
     for (var goog_index in goog) {
@@ -80,6 +83,7 @@ function compare_resolve_JSON(goog) {
     }
     goog_create_or_update_app_folder_file();
     save_local(); 
+    data.need_refresh_display = true;
     function resolve(goog_temp, local_temp) {
         if (goog_temp.updated >= local_temp.updated) {
             return goog_temp;//goog wins 

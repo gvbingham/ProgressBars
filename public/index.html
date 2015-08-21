@@ -90,6 +90,14 @@
         <div id="lightboxBG" onclick="cancel_hide_popups()"></div>
         <script>
 (function draw_frame() {
+    if(data.need_refresh_display == true) {
+        refresh_display();
+        data.need_refresh_display = false;
+    }
+    if(data.need_sync == true) {
+        sync();
+        data.need_sync = false;
+    }
     draw();
     window.requestAnimationFrame(draw_frame);
 })();

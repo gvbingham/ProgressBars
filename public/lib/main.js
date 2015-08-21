@@ -36,6 +36,7 @@ var data = {
     ],
     goog : {},
     need_sync : false,
+    need_refresh_display : false,
 };
 
 data.fib_values = (function () {
@@ -104,6 +105,7 @@ function create_bar_common(args) {
     }
     obj.time_obj = create_time_object();
     obj.scope_value = get_scope(obj.scope, obj.value) || 60 * 5; //abmiguous possible place for optimization
+    data.need_refresh_display = true;
     data.need_sync = true;
     return obj;
 }
@@ -140,8 +142,9 @@ function get_index_by_id (id) { //get the index of the bar providing the id of t
 
 function delete_bar (index) {
     BAR.bars.splice(index, 1);
+    data.need_refresh_display = true;
     data.need_sync = true;
-    return BAR.bars;
+    return BAR.bars; // don't really need the return
 }
 
 function update_bar (index, args) {
@@ -153,15 +156,17 @@ function update_bar (index, args) {
         }
     }
     my_bar.updated = get_time();
+    data.need_refresh_display = true;
     data.need_sync = true;
-    return my_bar;
+    return my_bar; // don't really need the return
 }
 
 function reset_bar (index) {
     // Need to get if check on 'not found'
     BAR.bars[index]['time_obj'] = create_time_object();
+    data.need_refresh_display = true;
     data.need_sync = true;
-    return update_bar(index, {stamp : Date.now()});
+    return update_bar(index, {stamp : Date.now()}); // don't really need the return
 }
 
 function get_percent (index, sort) {
@@ -226,14 +231,14 @@ function get_target_seconds(date, time) {
 
 function sort_execute (arr, type) {
     BAR.bars = sort_array(arr, type);
-    sync();
-    display();
+    data.need_refresh_display = true;
+    data.need_sync = true;
 }
 
 function change_category(new_category) {
    BAR.settings.current_category = new_category;
-   sync();
-   display();
+   data.need_refresh_display = true;
+   data.need_sync = true;
 }
 
 function sort_array (arr, type) {

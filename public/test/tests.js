@@ -115,6 +115,7 @@ suite('main.js', function () {
                 ],
                 goog : {},
                 need_sync : true,
+                need_refresh_display : true,
             };
             assert.deepEqual(data, temp);
         });
@@ -126,6 +127,7 @@ suite('main.js', function () {
             assert.isArray(data.relative_time);
             assert.isArray(data.fib_values);
             assert.isBoolean(data.need_sync);
+            assert.isBoolean(data.need_refresh_display);
         });
     });
     suite('Create a new bar', function () {
@@ -271,13 +273,60 @@ suite('main.js', function () {
 
 suite('sync.js', function () {
     suite('onload_sync', function () {
-
+        suite('onload_sync with data', function () {
+            setup(function () {
+                delete(localStorage.stamp);
+                delete(localStorage.bars);
+                delete(localStorage.settings);
+                save_local();
+                onload_sync();
+            });
+            test('onload_sync should update localStorage', function () {
+                assert.isNumber(BAR.stamp, 'localStorage.stamp should be a number');
+                assert.match(BAR.stamp, /^\d{13}$/, 'BAR.stamp should be a 13 digit number (hires time stamp)');
+                assert.match(parseInt(localStorage.stamp), /^\d{13}$/, 'BAR.stamp should be a 13 digit number (hires time stamp)');
+                assert.deepEqual(BAR.bars, JSON.parse(localStorage.bars), 'BAR.bars should equal localStorage.bars');
+                assert.deepEqual(BAR.settings, JSON.parse(localStorage.settings), 'BAR.settings should equal localStorage.settings');
+            });
+        });
+        suite('onload_sync without BAR.stamp or localStorage.stamp being undefined', function () {
+            setup(function () {
+                delete BAR.stamp;            
+                delete localStorage.stamp;            
+                onload_sync();
+            });
+            test('onload_sync should update localStorage', function () {
+                assert(BAR.stamp == 0, 'BAR.stamp should be 0');
+                assert(parseInt(localStorage.stamp) == 0, 'localStorage.stamp should be 0');
+            });
+        });
     });
     suite('save_local', function () {
-        
+        setup(function () {
+            save_local();
+        });
+        test('save_local should save BAR.bars, BAR.settings, and a stamp to localStorage by the same name', function () {
+            assert.closeTo(BAR.stamp, Date.now(), 1000, 'BAR.stamp should be a time stamp close to right now');
+            assert.deepEqual(BAR.bars, JSON.parse(localStorage.bars), 'localStorage.bars should be updated to match BAR.bars');
+            assert.deepEqual(BAR.settings, JSON.parse(localStorage.settings), 'localStorage.bars should be updated to match BAR.settings');
+        });
     });
     suite('sync', function () {
-        
+            //-[ ] setup where the cloud object is the same as the local object    
+            //-[ ] setup where the cloud object wins the local with one bar different
+            //-[ ] setup where the cloud object wins the local with a slight modification of one bar between the two
+            //-[ ] setup where the local object wins the cloud with one bar different
+            //-[ ] setup where the local object wins the cloud with a slight modification of one bar between the two
+            //-[ ] setup where the one object is completely different in content than the other but both are equal in stamp  -- will never happen
+            //-[ ] setup where the one object is completely different in content than the other and cloud wins
+            //-[ ] setup where the one object is completely different in content than the other and local wins
+        setup(function () {
+            BAR.bar = [];
+            BAR.bars.push(create_bar_common());
+            data.goog.content = {};
+            data.goog.content.bars = [];
+            data.goog.content.bars.push(create_bar_common());
+        });
     });
     suite('compare_resolve_JSON', function () {
         
