@@ -73,7 +73,14 @@ function compare_resolve_JSON() {
             var local_id = local[local_index].id;
             if (goog_id == local_id) {
                 exists = true;
-                BAR[local_index] = resolve(goog[goog_index], local[local_index]);
+                if (local[local_index]['deleted'] || goog[goog_index]['deleted']) {//if either deleted
+                    local.splice(local_index, 1);
+                    goog.splice(goog_index, 1); 
+                    compare_resolve_JSON();
+                }
+                else {// if not deleted go on to resolve
+                    local[local_index] = resolve(goog[goog_index], local[local_index]);
+                }
             }
         }
         if (exists == false) {

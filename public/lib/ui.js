@@ -91,9 +91,11 @@ function refresh_display() { //Used to first draw all in the viewed category
     var tmpstring = "";
     for (var i in BAR.bars) {
         if (BAR.bars[i].category === BAR.settings.current_category || BAR.settings.current_category === "all") {
-            BAR.bars[i].position = i;
-            tmpstring += template(BAR.bars[i]); 
-            //tmpstring += (BAR.bars[i].category == category) ? bar_container + BAR.bars[i].svg + '</div>' : "";
+            if (! BAR.bars[i]['deleted']) {
+                BAR.bars[i].position = i;
+                tmpstring += template(BAR.bars[i]); 
+                //tmpstring += (BAR.bars[i].category == category) ? bar_container + BAR.bars[i].svg + '</div>' : "";
+            }
         }
     } 
     document.getElementById("bars_container").innerHTML = tmpstring;

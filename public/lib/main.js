@@ -79,34 +79,34 @@ function create_bar_common(args) {
     var obj = {};
 
     obj.id          = create_id();
-    obj.title       = args.title       || 'New bar - ' + Math.round(Date.now() / 1000);
-    obj.description = args.description || null;
-    obj.category    = args.category    || 'main';
-    obj.created     = args.created     || time;
-    obj.updated     = args.updated     || time;
-    obj.stamp       = args.created     || time;
-    obj.history     = args.history     || [];
-    obj.type        = args.type        || 'interval';
+    obj.title       = args.title        || 'New bar - ' + Math.round(Date.now() / 1000);
+    obj.description = args.description  || null;
+    obj.category    = args.category     || 'main';
+    obj.created     = args.created      || time;
+    obj.updated     = args.updated      || time;
+    obj.stamp       = args.created      || time;
+    obj.history     = args.history      || [];
+    obj.type        = args.type         || 'interval';
     obj.color       = 'blue';
     if (obj.type == 'interval') {
-        obj.scope    = args.scope || null;
-        obj.value    = args.value || null;
+        obj.scope   = args.scope        || null;
+        obj.value   = args.value        || null;
     }
     else if (obj.type == 'target') {
-        obj.date     = args.date  || null;
-        obj.time     = args.time || null;
-        obj.scope    = 'Seconds';
-        obj.value    = get_target_seconds(obj.date, obj.time);
+        obj.date    = args.date         || null;
+        obj.time    = args.time         || null;
+        obj.scope   = 'Seconds';
+        obj.value   = get_target_seconds(obj.date, obj.time);
     }
     else if (obj.type == 'count_up') {
-        obj.color = 'lightBlue';
-        obj.scope = null;
-        obj.value = null;
+        obj.color   = 'lightBlue';
+        obj.scope   = null;
+        obj.value   = null;
     }
-    obj.time_obj = create_time_object();
+    obj.time_obj    = create_time_object();
     obj.scope_value = get_scope(obj.scope, obj.value) || 60 * 5; //abmiguous possible place for optimization
     data.need_refresh_display = true;
-    data.need_sync = true;
+    data.need_sync  = true;
     return obj;
 }
 
@@ -141,7 +141,8 @@ function get_index_by_id (id) { //get the index of the bar providing the id of t
 
 
 function delete_bar (index) {
-    BAR.bars.splice(index, 1);
+    //BAR.bars.splice(index, 1);
+    BAR.bars[index]['deleted'] = true;
     data.need_refresh_display = true;
     data.need_sync = true;
     return BAR.bars; // don't really need the return
