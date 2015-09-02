@@ -89,21 +89,23 @@ function create_bar_common(args) {
     obj.type        = args.type         || 'interval';
     obj.color       = 'blue';
     if (obj.type == 'interval') {
+        obj.time_obj = create_time_object();
         obj.scope   = args.scope        || null;
         obj.value   = args.value        || null;
     }
     else if (obj.type == 'target') {
+        obj.time_obj = create_time_object();
         obj.date    = args.date         || null;
         obj.time    = args.time         || null;
         obj.scope   = 'Seconds';
         obj.value   = get_target_seconds(obj.date, obj.time);
     }
     else if (obj.type == 'count_up') {
-        obj.color   = 'lightBlue';
-        obj.scope   = null;
-        obj.value   = null;
+        obj.time_obj = create_time_object(true);
+        obj.color = 'lightBlue';
+        obj.scope = null;
+        obj.value = null;
     }
-    obj.time_obj    = create_time_object();
     obj.scope_value = get_scope(obj.scope, obj.value) || 60 * 5; //abmiguous possible place for optimization
     data.need_refresh_display = true;
     data.need_sync  = true;
@@ -164,7 +166,12 @@ function update_bar (index, args) {
 
 function reset_bar (index) {
     // Need to get if check on 'not found'
-    BAR.bars[index]['time_obj'] = create_time_object();
+    if (BAR.bars[index]['type'] == 'count_up') {
+        BAR.bars[index]['time_obj'] = create_time_object(true);
+    }
+    else {
+        BAR.bars[index]['time_obj'] = create_time_object();
+    }
     data.need_refresh_display = true;
     data.need_sync = true;
     return update_bar(index, {stamp : Date.now()}); // don't really need the return
