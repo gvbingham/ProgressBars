@@ -63,6 +63,23 @@ function sync() {//used to get all cloud items and local storage. compare them, 
     //populate_category_header();
 }
 
+function remove_deleted(first, last) {
+    for (var first_index in first) {
+        if (first[first_index]['deleted']) {
+            for (var last_index in last) {
+                if (first[first_index]['id'] == last[last_index]['id']) {
+                    first.splice(first_index, 1);    
+                    last.splice(last_index, 1);    
+                    remove_deleted();
+                }
+                if (last_index >= last.length - 1) { // at the end of the local array do one more thing.
+                    first.splice(first_index, 1);
+                }
+            }
+        }
+    }
+}
+
 function compare_resolve_JSON() {
     var goog = data.goog.content.bars;
     var local = BAR.bars;
@@ -73,9 +90,7 @@ function compare_resolve_JSON() {
             var local_id = local[local_index].id;
             if (goog_id == local_id) {
                 exists = true;
-                if (local[local_index]['deleted'] || goog[goog_index]['deleted']) {//if either deleted
-                    local.splice(local_index, 1);
-                    goog.splice(goog_index, 1); 
+                if (local[local_index]['deleted'] || goog[goog_index]['deleted']) {// you may need to be outside of the goog_id == local_id; this just isn't firing.
                     compare_resolve_JSON();
                 }
                 else {// if not deleted go on to resolve

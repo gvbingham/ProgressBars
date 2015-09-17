@@ -4,11 +4,9 @@ function get_time() {
 
 function get_remaining_seconds(index) {
     if (BAR.bars[index].type == "count_up") {
-        BAR.bars[index]['remaining_seconds'] = (Date.now() - BAR.bars[index].stamp) / 1000;
+        return (Date.now() - BAR.bars[index].stamp) / 1000;
     }
-    else { // for target and interval
-        BAR.bars[index]['remaining_seconds'] = Math.floor((BAR.bars[index].stamp / 1000 + BAR.bars[index].scope_value) - (Date.now() / 1000));
-    }
+    BAR.bars[index]['remaining_seconds'] = Math.floor((BAR.bars[index].stamp / 1000 + BAR.bars[index].scope_value) - (Date.now() / 1000));
     get_relative_time_text(index);
 } 
 
@@ -44,12 +42,7 @@ function get_relative_time_text(index) {
 }
 
 function reset_time_obj(index) {
-    if (BAR.bars[index]['type'] == 'count_up') {
-        BAR.bars[index]['time_obj'] = create_time_object(true);
-    }
-    else {
-        BAR.bars[index]['time_obj'] = create_time_object();
-    }
+    BAR.bars[index]['time_obj'] = create_time_object;
 }
 
 function get_how_many_seconds_to_date (date) {
