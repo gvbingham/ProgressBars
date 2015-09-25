@@ -4,13 +4,42 @@ function get_time() {
 
 function get_remaining_seconds(index) {
     if (BAR.bars[index].type == "count_up") {
-        return (Date.now() - BAR.bars[index].stamp) / 1000;
+        BAR.bars[index]['remaining_seconds'] = Math.floor((Date.now() - BAR.bars[index].stamp) / 1000);
     }
-    BAR.bars[index]['remaining_seconds'] = Math.floor((BAR.bars[index].stamp / 1000 + BAR.bars[index].scope_value) - (Date.now() / 1000));
+    else {
+        BAR.bars[index]['remaining_seconds'] = Math.floor((BAR.bars[index].stamp / 1000 + BAR.bars[index].scope_value) - (Date.now() / 1000));
+    }
     get_relative_time_text(index);
 } 
 
 function get_relative_time_text(index) {
+    var my_remaining_seconds = BAR.bars[index]['remaining_seconds'];
+    if (my_remaining_seconds <= 0) { // if zero don't do any more calculating just exit function
+        BAR.bars[index]['time_text'] = ''; 
+        return;
+    }
+    var my_time_obj = BAR.bars[index]['time_obj'];
+    for (var i in my_time_obj) {
+        var big_s = '';
+        var small_s = '';
+        if (my_remaining_seconds >= my_time_obj[i]['value']) {
+            var big_num = Math.floor(my_remaining_seconds / my_time_obj[i]['value']);
+            var small_num = my_remaining_seconds % my_time_obj[i]['value'];
+            small_num = Math.floor(small_num / my_time_obj[Number(i) + 1]['value']);
+            if (big_num > 1) {big_s = 's'}
+            if (small_num > 1) {small_s = 's'}
+            BAR.bars[index]['time_text'] = big_num + ' ' + my_time_obj[i]['scope'] + big_s;
+            if (small_num == 0) { // Don't put 4 Weeks 0 Days but put just 4 Weeks
+                break;
+            }
+            BAR.bars[index]['time_text'] += ' ' + small_num + ' ' + my_time_obj[Number(i) + 1]['scope'] + small_s;
+            break;
+        }       
+    }
+
+
+
+/* 
     var my_remaining_seconds = BAR.bars[index]['remaining_seconds'];
     var my_time_obj = BAR.bars[index]['time_obj'];
     trim_it();
@@ -39,6 +68,7 @@ function get_relative_time_text(index) {
             BAR.bars[index]['time_text'] = '';
         }
     }
+    */
 }
 
 function reset_time_obj(index) {

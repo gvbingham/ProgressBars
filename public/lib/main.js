@@ -54,16 +54,14 @@ data.fib_values = (function () {
 })()
 
 function create_time_object (reverse) {
-    var scopes = ['Years', 'Months', 'Weeks', 'Days', 'Hours', 'Minutes', 'Seconds'];
+    var scopes = ['Year', 'Month', 'Week', 'Day', 'Hour', 'Minute', 'Second'];
     var values = [31536000, 2628000, 604800, 86400, 3600, 60, 1];
-    var nexts = ['Months', 'Weeks', 'Days', 'Hours', 'Minutes', 'Seconds', null];
     var caps = [55, 8, 3, 5, 21, 55, 55];
     var obj = [];
     for (var index in scopes) {
         obj.push({
             'scope' : scopes[index], 
             'value' : values[index], 
-            'next' : nexts[index], 
             'caps' : caps[index],
         });
     }
