@@ -261,7 +261,9 @@ suite('main.js', function () {
     });
     suite('delete_bar', function () {
         test('delete_bar will delete a bar',  function () {
-            assert(BAR.bars.length - 1 == delete_bar(3).length);
+            delete_bar(0);
+            assert(BAR.bars[0]['deleted'] == true);
+            assert(data.need_refresh_display == true);
         });
     });
     suite('get_unique_category_list', function () {
@@ -328,7 +330,29 @@ suite('sync.js', function () {
             data.goog.content.bars.push(create_bar_common());
         });
     });
-    suite('compare_resolve_JSON', function () {
-        
+    suite('remove_deleted', function () {
+        var local = [
+            {deleted : true, id : 2},
+            {id : 1},
+            {id : 4},
+            {deleted : true, id : 8},
+            {id : 3},
+        ];
+        var goog = [
+            {id : 4},
+            {id : 8},
+            {deleted : true, id : 2},
+            {id : 3},
+            {deleted : true, id : 9},
+        ];
+        setup(function () {
+            remove_deleted(local, goog);
+        });
+        test('length is correct for local', function () {
+            assert(local.length == 3);
+        });
+        test('length is correct for goog', function () {
+            assert(goog.length == 2);
+        });
     });
 });

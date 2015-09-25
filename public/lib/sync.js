@@ -24,22 +24,6 @@ function save_local() {
 }
 
 function sync() {//used to get all cloud items and local storage. compare them, and make a decision.
-    // case stories
-    // 1. computer is only device, no cloud
-    //      a. adds bar refreshes, needs to see bar come back
-    //      b. removes bar refreshes, needs to see bar still removed after refresh
-    //      c. modifies bar, refreshes, needs to see modified bar after refresh.
-    // 2. computer is only device, cloud
-    //      // same as above but with : 
-    //      a. adds bar with internet, refreshes with internet, needs to see utmost bar.
-    //      b. adds bar without internet, refreshes with internet, needs to see the utmost bar.
-    //      c. adds bar with internet, refreshes without internet, needs to see utmost bar.
-    //      d. adds bar without internet, refreshes without internet, needs to see the utmost bar.
-    // 3. computer is not only device,  no cloud
-    //      // same as above but with  : 
-    //      a. adds bar on computer and should see bar updated on phone
-    //      b.   
-    // 4. computer is not only device,  cloud
     if (BAR.settings.cloud.google == 1) {
         var request = gapi.client.drive.files.get({
             'fileId': data.goog.app_file_id,
@@ -64,42 +48,57 @@ function sync() {//used to get all cloud items and local storage. compare them, 
 }
 
 function remove_deleted(first, last) {
-    for (var first_index in first) {
-        if (first[first_index]['deleted']) {
-            for (var last_index in last) {
-                if (first[first_index]['id'] == last[last_index]['id']) {
-                    first.splice(first_index, 1);    
-                    last.splice(last_index, 1);    
-                    remove_deleted();
-                }
-                if (last_index >= last.length - 1) { // at the end of the local array do one more thing.
-                    first.splice(first_index, 1);
+    var deleted_ids = [];
+    for (var arg_index in arguments) {
+        var i = arguments[arg_index].length;
+        var arg_obj = arguments[arg_index];
+        while (i--) {
+            var bar = arg_obj[i];
+            var deleted = false;
+            if (arg_index != 0) {// if not the first go around
+                check_deleted_ids(bar);
+                if (deleted == false && bar && bar['deleted']) {
+                    delete_it(bar, 'push');
                 }
             }
+            else if (bar['deleted']) {
+                delete_it(bar, 'push');
+            }
         }
+    }
+    function check_deleted_ids (obj) {
+        for (var ids_index in deleted_ids) {
+            if (deleted_ids[ids_index] == obj['id']) {
+                delete_it(obj);
+                deleted = true;
+                break;
+            }
+        } 
+    }
+    function delete_it (obj, push) {
+        if (push) {
+            deleted_ids.push(obj['id']);   
+        }
+        arg_obj.splice(i, 1);
     }
 }
 
 function compare_resolve_JSON() {
     var goog = data.goog.content.bars;
     var local = BAR.bars;
+    remove_deleted(local, goog); 
     var exists = false;
     for (var goog_index in goog) {
         var goog_id = goog[goog_index].id;
         for (var local_index in local) {
             var local_id = local[local_index].id;
-            if (goog_id == local_id) {
+            if (goog_id == local_id) {//Compare ids when they match ...
                 exists = true;
-                if (local[local_index]['deleted'] || goog[goog_index]['deleted']) {// you may need to be outside of the goog_id == local_id; this just isn't firing.
-                    compare_resolve_JSON();
-                }
-                else {// if not deleted go on to resolve
-                    local[local_index] = resolve(goog[goog_index], local[local_index]);
-                }
+                local[local_index] = resolve(goog[goog_index], local[local_index]); // Make local whatever won the resolve.
             }
         }
         if (exists == false) {
-            BAR.bars.push(goog[goog_index]);    
+            BAR.bars.push(goog[goog_index]);// Needed to be there in the case that goog bar doesn't exist or no match was found
         }
         exists = false;
     }
@@ -107,7 +106,7 @@ function compare_resolve_JSON() {
     save_local(); 
     data.need_refresh_display = true;
     function resolve(goog_temp, local_temp) {
-        if (goog_temp.updated >= local_temp.updated) {
+        if (goog_temp.updated >= local_temp.updated) { // Compare updated time stamps
             return goog_temp;//goog wins 
         }
         if (goog_temp.updated < local_temp.updated) {
