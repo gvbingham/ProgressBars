@@ -23,16 +23,22 @@ function get_relative_time_text(index) {
         var big_s = '';
         var small_s = '';
         if (my_remaining_seconds >= my_time_obj[i]['value']) {
+
+            // Do big number stuff
             var big_num = Math.floor(my_remaining_seconds / my_time_obj[i]['value']);
-            var small_num = my_remaining_seconds % my_time_obj[i]['value'];
-            small_num = Math.floor(small_num / my_time_obj[Number(i) + 1]['value']);
             if (big_num > 1) {big_s = 's'}
-            if (small_num > 1) {small_s = 's'}
             BAR.bars[index]['time_text'] = big_num + ' ' + my_time_obj[i]['scope'] + big_s;
-            if (small_num == 0) { // Don't put 4 Weeks 0 Days but put just 4 Weeks
-                break;
+
+            // Do small number stuff
+            if (i < my_time_obj.length - 1) { // if at last point on time_obj (seconds) should not have a smaller number
+                var small_num = my_remaining_seconds % my_time_obj[i]['value'];
+                small_num = Math.floor(small_num / my_time_obj[Number(i) + 1]['value']);
+                if (small_num > 1) {small_s = 's'}
+                if (small_num == 0) { // Don't put 4 Weeks 0 Days but put just 4 Weeks
+                    break;
+                }
+                BAR.bars[index]['time_text'] += ' ' + small_num + ' ' + my_time_obj[Number(i) + 1]['scope'] + small_s;
             }
-            BAR.bars[index]['time_text'] += ' ' + small_num + ' ' + my_time_obj[Number(i) + 1]['scope'] + small_s;
             break;
         }       
     }
