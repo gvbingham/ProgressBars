@@ -42,39 +42,6 @@ function get_relative_time_text(index) {
             break;
         }       
     }
-
-
-
-/* 
-    var my_remaining_seconds = BAR.bars[index]['remaining_seconds'];
-    var my_time_obj = BAR.bars[index]['time_obj'];
-    trim_it();
-    function trim_it () {
-        if (my_time_obj.length != 0) { // continue to calculate time_text when there is anything of my_time_obj
-            for (var i in my_time_obj) {
-                if (my_remaining_seconds < my_time_obj[i]['value']) {
-                    my_time_obj.splice(i, 1);
-                    trim_it();
-                }
-                else { // in the case of remaining seconds being greater than the first position of the time_obj
-                    var big_num = Math.floor(my_remaining_seconds / my_time_obj[0]['value']);
-                    var small_num = my_remaining_seconds % my_time_obj[0]['value'];
-                    BAR.bars[index]['time_text'] = big_num + ' '+ my_time_obj[0]['scope'];
-                    if (my_time_obj[1]) { // seems to not be working
-                        small_num = Math.floor(small_num / my_time_obj[1]['value'])
-                        if (small_num != 0) {
-                            BAR.bars[index]['time_text'] += ' ' + small_num + ' ' + my_time_obj[1]['scope'];
-                        }
-                    }
-                }
-            }
-        }
-        else { // only fired if the my_time_obj does not exist any longer. (Happens when the remaining seconds is less than 0)
-            // I probably want to get to the point of calculating how much time has elapsed after 0
-            BAR.bars[index]['time_text'] = '';
-        }
-    }
-    */
 }
 
 function reset_time_obj(index) {
